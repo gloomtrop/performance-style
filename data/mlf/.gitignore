@@ -1,0 +1,8 @@
+# Mid-level perceptual musical features dataset is not pushed to git
+# Download it from: https://osf.io/5aupt/
+
+# Everything should be disregarded...
+*
+
+# ...except the .gitignore file
+!.gitignore

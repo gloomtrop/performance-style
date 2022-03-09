@@ -1,0 +1,9 @@
+# AlignmentTool by Nakamura is not pushed to git
+# Download it from: https://midialignment.github.io/demo.html
+
+
+# Everything should be disregarded...
+*
+
+# ...except the .gitignore file and meta
+!.gitignore

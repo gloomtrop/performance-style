@@ -10,9 +10,10 @@ file_names = paths.get_files(path)
 
 all_notes = pd.DataFrame()
 for performance_name in file_names:
-    performance_path = os.path.join(path, performance_name)
-    df = pd.read_json(performance_path)
-    all_notes = pd.concat([all_notes, df])
+    if performance_name != 'avg.json':
+        performance_path = os.path.join(path, performance_name)
+        df = pd.read_json(performance_path)
+        all_notes = pd.concat([all_notes, df])
 
 averages = all_notes.groupby(by=all_notes.index).mean()
 stds = all_notes.groupby(by=all_notes.index).std()

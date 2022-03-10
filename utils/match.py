@@ -41,4 +41,4 @@ def get_notes_df(file_path: str) -> pd.DataFrame:
     # Remove duplicates, several notes have been matched with the same note in the score
     removed_duplicates = matched_notes[~matched_notes['note_id'].duplicated(keep='first')].reset_index(drop=True)
 
-    return removed_duplicates
+    return removed_duplicates.set_index('note_id')

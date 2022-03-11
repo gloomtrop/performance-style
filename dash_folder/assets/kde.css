@@ -1,6 +1,14 @@
 
-#dimension-dd div.Select-menu-outer {
+#dimension-dd div.Select-menu-outer,
+#sample-performer div.Select-menu-outer {
     position: absolute;
     transform: translateY(-100%);
+}
+
+#classification{
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 5px;
+    padding: 20px;
 }
 

@@ -1,3 +1,4 @@
+from copy import deepcopy
 import dash
 from dash import dcc
 from dash import html
@@ -6,21 +7,36 @@ from dash_folder.template import assets_folder, colors
 import plotly.figure_factory as ff
 from sklearn.neighbors import KernelDensity
 from utils import paths
+from utils.dash import get_trigger
 import os
 import pandas as pd
 import numpy as np
 import scipy
 
 app = dash.Dash(__name__, assets_folder=assets_folder, title='KDE')
-RUN_PORT = 8059
+RUN_PORT = 8058
 
 PERFORMERS = [f'p{i}' for i in range(11)]
 COLUMNS = ['time_onset', 'time_offset', 'velocity_onset', 'velocity_offset', 'duration']
 STD_COLUMNS = [name + '_standardized' for name in COLUMNS]
-TEST_PERFORMER = 0
+START_PERFORMER = 0
 TEST_AMOUNT = 100
 GENERATE_POINTS = True
 GENERATED_AMOUNT = 200
+SAMPLE_COLOR = '#1df22f'
+POPULATION_COLOR = '#13941e'
+WRONG_COLOR = '#f22f1d'
+COLORS = ['#333F44', '#37AA9C', '#94F3E4', '#33AA99', '#99FFEE', '#333F44', '#37AA9C', '#94F3E4', '#33AA99', '#99FFEE',
+          '#333F44', SAMPLE_COLOR]
+
+DIMENSION_OPTIONS = [
+    {'value': 'time_onset_standardized', 'label': 'Onset Time'},
+    {'value': 'time_offset_standardized', 'label': 'Offset Time'},
+    {'value': 'velocity_onset_standardized', 'label': 'Onset Velocity'},
+    {'value': 'velocity_offset_standardized', 'label': 'Offset Velocity'},
+    {'value': 'duration_standardized', 'label': 'Duration'}
+]
+PERFORMER_OPTIONS = [{'label': p, 'value': p} for p in PERFORMERS]
 
 
 def load_data(piece='D960', split=0.8, filter='std'):
@@ -50,7 +66,7 @@ def load_data(piece='D960', split=0.8, filter='std'):
 
 def compute_entropies(sample_distributions, performer_distributions):
     return np.array(
-        [sum([scipy.stats.entropy(sample_distributions[i], pdist[i]) for i in range(len(sample_distributions))]) for
+        [[scipy.stats.entropy(sample_distributions[i], pdist[i]) for i in range(len(sample_distributions))] for
          pdist in performer_distributions])
 
 
@@ -104,69 +120,105 @@ n_samples = 100
 
 train, test = load_data()
 
-options = [
-    {'value': 'time_onset_standardized', 'label': 'Onset Time'},
-    {'value': 'time_offset_standardized', 'label': 'Offset Time'},
-    {'value': 'velocity_onset_standardized', 'label': 'Onset Velocity'},
-    {'value': 'velocity_offset_standardized', 'label': 'Offset Velocity'},
-    {'value': 'duration_standardized', 'label': 'Duration'}
-]
-
 min_value = train.min()
 max_value = train.max()
 
 pdist, pX = get_performer_distributions(train, bandwidth, min_value, max_value, n_samples)
 
-sample = test[test['performer'] == PERFORMERS[TEST_PERFORMER]][:TEST_AMOUNT]
+sample = test[test['performer'] == PERFORMERS[START_PERFORMER]][:TEST_AMOUNT]
 
 sdist, sX = get_sample_distributions(sample, bandwidth, min_value, max_value, n_samples)
 
 entropies = compute_entropies(sdist, pdist)
-
-colors = ['#333F44', '#37AA9C', '#94F3E4', '#33AA99', '#99FFEE', '#333F44', '#37AA9C', '#94F3E4', '#33AA99', '#99FFEE',
-          '#333F44', '#1df22f']
-colors[TEST_PERFORMER] = '#13941e'
 pX_transposed = list(map(list, zip(*pX)))
-
-
 
 app.layout = html.Div([
     dcc.Graph(
         id='kde',
         style=dict(
-            height='90vh',
-            width='80vw'
+            height='85vh',
+            width='90vw'
         )),
     html.Div([
+        html.Div(id='classification'),
         dcc.Dropdown(
-            id='dimension-dd',
+            id='sample-performer',
             clearable=False,
-            value=options[0]['value'],
-            options=options,
+            value=PERFORMER_OPTIONS[0]['value'],
+            options=PERFORMER_OPTIONS,
             style={
                 'width': '20vw'
             }
-        )
-    ])
+        ),
+        dcc.Dropdown(
+            id='dimension-dd',
+            clearable=False,
+            value=DIMENSION_OPTIONS[0]['value'],
+            options=DIMENSION_OPTIONS,
+            style={
+                'width': '20vw'
+            }
+        ),
+
+    ],
+        style={
+            'display': 'flex',
+            'justify-content': 'space-evenly',
+            'align-items': 'center',
+            'width': '100vw',
+            'height': '15vh'
+        })
 ], style={
     'display': 'flex',
     'flex-direction': 'column',
-    'justify-content': 'center',
     'align-items': 'center',
     'height': '100vh',
     'width': '100vw',
 })
 
+
 @app.callback(Output('kde', 'figure'),
-              Input('dimension-dd', 'value'),)
-def change_piece_options(dimension):
-    id = list(train.columns).index(dimension)
-    histograms = pX_transposed[id] + [sX[id]]
-    names = PERFORMERS + ['Sample']
+              Output('classification','children'),
+              Output('classification','style'),
+              Input('dimension-dd', 'value'),
+              Input('sample-performer', 'value'))
+def change_piece_options(dimension, performer):
+    global sX
+    global entropies
+    trigger = get_trigger()
+
+    performer_id = PERFORMERS.index(performer)
+    dimension_id = list(train.columns).index(dimension)
+
+    updated_colors = deepcopy(COLORS)
+    updated_colors[performer_id] = POPULATION_COLOR
+
+    if trigger == 'sample-performer':
+        sample = test[test['performer'] == PERFORMERS[performer_id]][:TEST_AMOUNT]
+        sdist, sX = get_sample_distributions(sample, bandwidth, min_value, max_value, n_samples)
+        entropies = compute_entropies(sdist, pdist)
+
+    histograms = pX_transposed[dimension_id] + [sX[dimension_id]]
+    names = []
+    for i, entropy in enumerate(entropies.transpose()[dimension_id]):
+        names.append(f'{PERFORMERS[i]} - {entropy:.2f}')
+    names += ['Sa']
+
+    summed_entropies = [sum(e) for e in entropies]
+    classified_performer = classify_performer(summed_entropies)
+
+    if classified_performer == performer:
+        style = {
+            'border-color': SAMPLE_COLOR
+        }
+    else:
+        style = {
+            'border-color': WRONG_COLOR
+        }
 
     # Create distplot with curve_type set to 'normal'
-    fig = ff.create_distplot(histograms, names, show_hist=False, colors=colors)
-    return fig
+    fig = ff.create_distplot(histograms, names, show_hist=False, colors=updated_colors)
+    return fig, classified_performer, style
 
 
 if __name__ == '__main__':

@@ -2,9 +2,7 @@ from sklearn.neighbors import KernelDensity
 from utils import paths
 import os
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import scipy
+from models.statistical import KDE_classifier
 
 PERFORMERS = [f'p{i}' for i in range(11)]
 COLUMNS = ['time_onset', 'time_offset', 'velocity_onset', 'velocity_offset', 'duration']
@@ -36,61 +34,13 @@ def load_data(piece='D960', split=0.8, filter='std'):
     return training_data[columns], test_data[columns]
 
 
-def compute_entropies(sample_distributions, performer_distributions):
-    return np.array(
-        [sum([scipy.stats.entropy(sample_distributions[i], pdist[i]) for i in range(len(sample_distributions))]) for
-         pdist in performer_distributions])
-
-
-def get_sample_distributions(df, bandwidth, min_value, max_value, n_samples):
-    sample_distributions = []
-    for column in df.columns:
-        if column != 'performer':
-            X = df[column].dropna().to_numpy().reshape(-1, 1)
-            kde = KernelDensity(kernel='gaussian', bandwidth=bandwidth).fit(X)
-            x = np.linspace(min_value[column], max_value[column], n_samples)
-            log = kde.score_samples(x.reshape(-1, 1))
-            sample_distributions.append(np.exp(log))
-    return np.array(sample_distributions)
-
-
-def get_performer_distributions(df, bandwidth, min_value, max_value, n_samples):
-    ds = []
-    for performer in PERFORMERS:
-        mask = df['performer'] == performer
-        data = df[mask]
-        performer_ds = []
-        for column in data.columns:
-            if column != 'performer':
-                X = data[column].dropna().to_numpy().reshape(-1, 1)
-                kde = KernelDensity(kernel='gaussian', bandwidth=bandwidth).fit(X)
-                x = np.linspace(min_value[column], max_value[column], n_samples)
-                log = kde.score_samples(x.reshape(-1, 1))
-                performer_ds.append(np.exp(log))
-        ds.append(np.array(performer_ds))
-    return np.array(ds)
-
-
-def classify_performer(entropies):
-    index = np.argmin(np.array(entropies))
-    return PERFORMERS[index]
-
-
 bandwidth = 0.1
 n_samples = 100
 
 train, test = load_data()
 
-min_value = train.min()
-max_value = train.max()
-
-pdist = get_performer_distributions(train, bandwidth, min_value, max_value, n_samples)
+classifier = KDE_classifier(train, PERFORMERS, bandwidth, n_samples)
 
 sample = test[test['performer'] == PERFORMERS[5]]
 
-sdist = get_sample_distributions(sample, bandwidth, min_value, max_value, n_samples)
-
-entropies = compute_entropies(sdist, pdist)
-
-print(entropies)
-print(classify_performer(entropies))
+print(classifier.predict(sample))

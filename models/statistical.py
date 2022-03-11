@@ -15,10 +15,15 @@ class KDE_classifier:
 
     def predict(self, X):
         sample_distributions = self.get_sample_distributions(X)
-        entropies = self.compute_entropies(sample_distributions)
+        entropies = self.compute_entropy_summed(sample_distributions)
         return self.classify_performer(entropies)
 
-    def compute_entropies(self, sample_distributions):
+    def compute_entropy_matrix(self, sample_distributions):
+        return np.array(
+            [[scipy.stats.entropy(sample_distributions[i], pdist[i]) for i in range(len(sample_distributions))] for
+             pdist in self.performer_distributions])
+
+    def compute_entropy_summed(self, sample_distributions):
         return np.array(
             [sum([scipy.stats.entropy(sample_distributions[i], pdist[i]) for i in range(len(sample_distributions))]) for
              pdist in self.performer_distributions])

@@ -19,9 +19,9 @@ RUN_PORT = 8058
 PERFORMERS = [f'p{i}' for i in range(11)]
 START_PERFORMER = 0
 
-COLUMNS = ['time_onset', 'time_offset', 'velocity_onset', 'velocity_offset', 'duration']
+COLUMNS = ['time_onset', 'time_offset', 'velocity_onset', 'velocity_offset', 'duration', 'inter_onset_interval']
 STD_COLUMNS = [name + '_standardized' for name in COLUMNS]
-LABELS = ['Onset Time', 'Offset Time', 'Onset Velocity', 'Offset Velocity', 'Duration']
+LABELS = ['Onset Time', 'Offset Time', 'Onset Velocity', 'Offset Velocity', 'Duration', 'Inter Onset Interval']
 
 TEST_AMOUNT = 100
 GENERATE_POINTS = True
@@ -29,7 +29,6 @@ GENERATED_AMOUNT = 200
 
 BANDWIDTH = 0.1
 N_SAMPLES = 100
-
 
 SAMPLE_COLOR = '#1df22f'
 POPULATION_COLOR = '#13941e'

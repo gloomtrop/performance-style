@@ -18,8 +18,7 @@ for performance_name in file_names:
 averages = all_notes.groupby(by=all_notes.index).mean()
 stds = all_notes.groupby(by=all_notes.index).std()
 
-
-columns = ['time_onset', 'time_offset', 'velocity_onset', 'velocity_offset','duration']
+columns = ['time_onset', 'time_offset', 'velocity_onset', 'velocity_offset','duration', 'inter_onset_interval']
 data = averages[columns].join(stds[columns], lsuffix='_avg', rsuffix='_std')
 
 file_path = os.path.join(path, 'avg.json')

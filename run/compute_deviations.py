@@ -2,7 +2,7 @@ import os
 from utils import paths
 import pandas as pd
 
-columns = ['time_onset', 'time_offset', 'velocity_onset', 'velocity_offset','duration', 'inter_onset_interval']
+columns = ['time_onset', 'time_offset', 'velocity_onset', 'velocity_offset', 'duration', 'inter_onset_interval', 'offset_time_duration']
 piece = 'D960'
 notes_path = os.path.join(paths.get_root_folder(), 'processed data', piece, 'notes')
 deviation_path = os.path.join(paths.get_root_folder(), 'processed data', piece, 'deviations')

@@ -19,9 +19,9 @@ RUN_PORT = 8058
 PERFORMERS = [f'p{i}' for i in range(11)]
 START_PERFORMER = 0
 
-COLUMNS = ['time_onset', 'time_offset', 'velocity_onset', 'velocity_offset', 'duration', 'inter_onset_interval']
+COLUMNS = ['time_onset', 'time_offset', 'velocity_onset', 'velocity_offset', 'duration', 'inter_onset_interval', 'offset_time_duration']
 STD_COLUMNS = [name + '_standardized' for name in COLUMNS]
-LABELS = ['Onset Time', 'Offset Time', 'Onset Velocity', 'Offset Velocity', 'Duration', 'Inter Onset Interval']
+LABELS = ['Onset Time', 'Offset Time', 'Onset Velocity', 'Offset Velocity', 'Duration', 'Inter Onset Interval', 'Offset Time Duration']
 
 TEST_AMOUNT = 100
 GENERATE_POINTS = True

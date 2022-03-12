@@ -34,8 +34,11 @@ def get_notes_df(file_path: str) -> pd.DataFrame:
     # Add duration feature
     notes_df['duration'] = notes_df['time_offset'] - notes_df['time_onset']
 
-    # Add inter onset interval
+    # Add Inter Onset Interval
     notes_df['inter_onset_interval'] = notes_df['time_onset'].diff()
+
+    # Add Offset Time Duration
+    notes_df['offset_time_duration'] = notes_df['time_onset'].shift() - notes_df['time_offset']
 
     # Remove notes that are not found in the score
     unmatched = notes_df['note_id'] == '*'

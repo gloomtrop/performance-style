@@ -17,29 +17,31 @@ app = dash.Dash(__name__, assets_folder=assets_folder, title='KDE')
 RUN_PORT = 8058
 
 PERFORMERS = [f'p{i}' for i in range(11)]
+START_PERFORMER = 0
+
 COLUMNS = ['time_onset', 'time_offset', 'velocity_onset', 'velocity_offset', 'duration']
 STD_COLUMNS = [name + '_standardized' for name in COLUMNS]
-START_PERFORMER = 0
+LABELS = ['Onset Time', 'Offset Time', 'Onset Velocity', 'Offset Velocity', 'Duration']
+
 TEST_AMOUNT = 100
 GENERATE_POINTS = True
 GENERATED_AMOUNT = 200
+
+BANDWIDTH = 0.1
+N_SAMPLES = 100
+
+
 SAMPLE_COLOR = '#1df22f'
 POPULATION_COLOR = '#13941e'
 WRONG_COLOR = '#f22f1d'
 COLORS = ['#333F44', '#37AA9C', '#94F3E4', '#33AA99', '#99FFEE', '#333F44', '#37AA9C', '#94F3E4', '#33AA99', '#99FFEE',
           '#333F44', SAMPLE_COLOR]
 
-DIMENSION_OPTIONS = [
-    {'value': 'time_onset_standardized', 'label': 'Onset Time'},
-    {'value': 'time_offset_standardized', 'label': 'Offset Time'},
-    {'value': 'velocity_onset_standardized', 'label': 'Onset Velocity'},
-    {'value': 'velocity_offset_standardized', 'label': 'Offset Velocity'},
-    {'value': 'duration_standardized', 'label': 'Duration'}
-]
+DIMENSION_OPTIONS = [{'label': l, 'value': v} for (l, v) in zip(LABELS, COLUMNS)]
 PERFORMER_OPTIONS = [{'label': p, 'value': p} for p in PERFORMERS]
 
 
-def load_data(piece='D960', split=0.8, filter='std'):
+def load_data(piece='D960', split=0.8, filter='unstd'):
     training_data = pd.DataFrame()
     test_data = pd.DataFrame()
     deviations_path = os.path.join(paths.get_root_folder(), 'processed data', piece, 'deviations')
@@ -57,7 +59,7 @@ def load_data(piece='D960', split=0.8, filter='std'):
     if filter == 'std':
         columns = STD_COLUMNS + ['performer']
     elif filter == 'unstd':
-        columns = STD_COLUMNS + ['performer']
+        columns = COLUMNS + ['performer']
     else:
         columns = COLUMNS + STD_COLUMNS + ['performer']
 
@@ -115,19 +117,16 @@ def classify_performer(entropies):
     return PERFORMERS[index]
 
 
-bandwidth = 0.1
-n_samples = 100
-
 train, test = load_data()
 
 min_value = train.min()
 max_value = train.max()
 
-pdist, pX = get_performer_distributions(train, bandwidth, min_value, max_value, n_samples)
+pdist, pX = get_performer_distributions(train, BANDWIDTH, min_value, max_value, N_SAMPLES)
 
 sample = test[test['performer'] == PERFORMERS[START_PERFORMER]][:TEST_AMOUNT]
 
-sdist, sX = get_sample_distributions(sample, bandwidth, min_value, max_value, n_samples)
+sdist, sX = get_sample_distributions(sample, BANDWIDTH, min_value, max_value, N_SAMPLES)
 
 entropies = compute_entropies(sdist, pdist)
 pX_transposed = list(map(list, zip(*pX)))
@@ -178,8 +177,8 @@ app.layout = html.Div([
 
 
 @app.callback(Output('kde', 'figure'),
-              Output('classification','children'),
-              Output('classification','style'),
+              Output('classification', 'children'),
+              Output('classification', 'style'),
               Input('dimension-dd', 'value'),
               Input('sample-performer', 'value'))
 def change_piece_options(dimension, performer):
@@ -195,7 +194,7 @@ def change_piece_options(dimension, performer):
 
     if trigger == 'sample-performer':
         sample = test[test['performer'] == PERFORMERS[performer_id]][:TEST_AMOUNT]
-        sdist, sX = get_sample_distributions(sample, bandwidth, min_value, max_value, n_samples)
+        sdist, sX = get_sample_distributions(sample, BANDWIDTH, min_value, max_value, N_SAMPLES)
         entropies = compute_entropies(sdist, pdist)
 
     histograms = pX_transposed[dimension_id] + [sX[dimension_id]]

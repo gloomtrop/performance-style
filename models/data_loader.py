@@ -1,31 +1,35 @@
 from utils import paths
 import os
 import pandas as pd
-
-COLUMNS = ['time_onset', 'time_offset', 'velocity_onset', 'velocity_offset', 'duration']
-STD_COLUMNS = [name + '_standardized' for name in COLUMNS]
+from utils.preprocessing import NUMBER_COLUMN_NAMES, STD_NUMBER_COLUMN_NAMES
 
 
-def load_data(piece='D960', split=0.8, filter='std'):
-    training_data = pd.DataFrame()
-    test_data = pd.DataFrame()
-    deviations_path = os.path.join(paths.get_root_folder(), 'processed data', piece, 'deviations')
-    deviations_names = paths.get_files(deviations_path)
-    for deviation in deviations_names:
-        data_path = os.path.join(deviations_path, deviation)
-        performer = deviation.split('-')[0]
-        data = pd.read_json(data_path)
-        length = int(data.shape[0] * split)
-        data['performer'] = performer
-        training_data = pd.concat([training_data, data[:length]])
-        test_data = pd.concat([test_data, data[length:]])
+def load_data(piece='D960', filter='unstd'):
+    deviations_path = os.path.join(paths.get_root_folder(), 'processed data', piece, 'deviations.json')
+    data = pd.read_json(deviations_path)
 
     # Filtering
     if filter == 'std':
-        columns = STD_COLUMNS + ['performer']
+        columns = STD_NUMBER_COLUMN_NAMES + ['performer']
     elif filter == 'unstd':
-        columns = STD_COLUMNS + ['performer']
+        columns = NUMBER_COLUMN_NAMES + ['performer']
     else:
-        columns = COLUMNS + STD_COLUMNS + ['performer']
+        columns = NUMBER_COLUMN_NAMES + STD_NUMBER_COLUMN_NAMES + ['performer']
 
-    return training_data[columns], test_data[columns]
+    return data[columns]
+
+
+def load_split(piece='D960', split=0.8, filter='unstd'):
+    training_data = pd.DataFrame()
+    test_data = pd.DataFrame()
+
+    data = load_data(piece, filter)
+
+    for performer in data['performer'].unique():
+        performer_mask = data['performer'] == performer
+        performer_data = data[performer_mask]
+        length = int(performer_data.shape[0] * split)
+        training_data = pd.concat([training_data, performer_data[:length]])
+        test_data = pd.concat([test_data, performer_data[length:]])
+
+    return training_data, test_data

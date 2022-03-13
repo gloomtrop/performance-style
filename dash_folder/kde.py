@@ -6,7 +6,7 @@ from dash.dependencies import Input, Output, State
 from dash_folder.template import assets_folder, colors
 import plotly.figure_factory as ff
 from sklearn.neighbors import KernelDensity
-from utils import paths
+from models import data_loader
 from utils.dash import get_trigger
 import os
 import pandas as pd
@@ -39,30 +39,6 @@ COLORS = ['#333F44', '#37AA9C', '#94F3E4', '#33AA99', '#99FFEE', '#333F44', '#37
 DIMENSION_OPTIONS = [{'label': l, 'value': v} for (l, v) in zip(LABELS, COLUMNS)]
 PERFORMER_OPTIONS = [{'label': p, 'value': p} for p in PERFORMERS]
 
-
-def load_data(piece='D960', split=0.8, filter='unstd'):
-    training_data = pd.DataFrame()
-    test_data = pd.DataFrame()
-    deviations_path = os.path.join(paths.get_root_folder(), 'processed data', piece, 'deviations')
-    deviations_names = paths.get_files(deviations_path)
-    for deviation in deviations_names:
-        data_path = os.path.join(deviations_path, deviation)
-        performer = deviation.split('-')[0]
-        data = pd.read_json(data_path)
-        length = int(data.shape[0] * split)
-        data['performer'] = performer
-        training_data = pd.concat([training_data, data[:length]])
-        test_data = pd.concat([test_data, data[length:]])
-
-    # Filtering
-    if filter == 'std':
-        columns = STD_COLUMNS + ['performer']
-    elif filter == 'unstd':
-        columns = COLUMNS + ['performer']
-    else:
-        columns = COLUMNS + STD_COLUMNS + ['performer']
-
-    return training_data[columns], test_data[columns]
 
 
 def compute_entropies(sample_distributions, performer_distributions):
@@ -116,7 +92,7 @@ def classify_performer(entropies):
     return PERFORMERS[index]
 
 
-train, test = load_data()
+train, test = data_loader.load_split()
 
 min_value = train.min()
 max_value = train.max()

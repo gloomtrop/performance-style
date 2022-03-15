@@ -5,28 +5,31 @@ import scipy
 
 class KDE_classifier:
 
-    def __init__(self, training_data, performers, bandwidth=0.1, n_samples=100):
+    def __init__(self, training_data, performers, weights=None, bandwidth=0.1, n_samples=100):
         self.performers = performers
         self.bandwidth = bandwidth
         self.n_samples = n_samples
         self.min_value = training_data.min()
         self.max_value = training_data.max()
         self.performer_distributions = self.get_performer_distributions(training_data)
+        if weights is not None:
+            self.weights = weights
+        else:
+            self.weights = np.ones(len(training_data.columns) - 1)
 
     def predict(self, X):
         sample_distributions = self.get_sample_distributions(X)
-        entropies = self.compute_entropy_summed(sample_distributions)
-        return self.classify_performer(entropies)
+        entropy_matrix = self.compute_entropy_matrix(sample_distributions)
+        summed_endtropies = self.sum_entropies(entropy_matrix)
+        return self.classify_performer(summed_endtropies)
 
     def compute_entropy_matrix(self, sample_distributions):
         return np.array(
             [[scipy.stats.entropy(sample_distributions[i], pdist[i]) for i in range(len(sample_distributions))] for
              pdist in self.performer_distributions])
 
-    def compute_entropy_summed(self, sample_distributions):
-        return np.array(
-            [sum([scipy.stats.entropy(sample_distributions[i], pdist[i]) for i in range(len(sample_distributions))]) for
-             pdist in self.performer_distributions])
+    def sum_entropies(self, entropy_matrix):
+        return np.dot(entropy_matrix, self.weights)
 
     def get_sample_distributions(self, df):
         sample_distributions = []

@@ -12,9 +12,10 @@ PERFORMERS = [f'p{i}' for i in range(11)]
 
 bandwidth = 0.1
 n_samples = 100
+weights = np.array([1,1,1,1,1,1,1])
 
 train, test = load_split()
-cl = KDE_classifier(train, PERFORMERS, bandwidth, n_samples)
+cl = KDE_classifier(train, PERFORMERS, weights=weights, bandwidth=bandwidth, n_samples=n_samples)
 
 y_true, y_pred = test_classifier(cl, test)
 

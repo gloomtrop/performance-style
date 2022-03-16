@@ -1,7 +1,7 @@
 import numpy as np
 import optuna
-from models.statistical import KDE_classifier
-from models.data_loader import load_split
+from models.kde import KDE_classifier
+from utils.loading import load_split
 from utils.testing import test_classifier, compute_accuracy
 
 PERFORMERS = [f'p{i}' for i in range(11)]
@@ -24,12 +24,12 @@ def objective(trial):
     x7 = trial.suggest_float('Onset Time Duration', 0, 1)
 
     cl.weights = np.array([x1, x2, x3, x4, x5, x6, x7])
-    y_true, y_pred = test_classifier(cl, test)
+    y_true, y_pred = test_classifier(cl, test, 100, 25)
     accuracy = compute_accuracy(y_true, y_pred)
     return 1 - accuracy
 
 
 study = optuna.create_study()
-study.optimize(objective, n_trials=100)
+study.optimize(objective, n_trials=1000)
 
 print(study.best_params)

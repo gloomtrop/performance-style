@@ -6,7 +6,7 @@ from dash.dependencies import Input, Output, State
 from dash_folder.template import assets_folder, colors
 import plotly.figure_factory as ff
 from sklearn.neighbors import KernelDensity
-from models import data_loader
+from utils.loading import load_split
 from utils.dash import get_trigger
 import os
 import pandas as pd
@@ -92,7 +92,7 @@ def classify_performer(entropies):
     return PERFORMERS[index]
 
 
-train, test = data_loader.load_split()
+train, test = load_split()
 
 min_value = train.min()
 max_value = train.max()

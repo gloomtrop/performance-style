@@ -1,11 +1,11 @@
-from utils import paths
 import os
 import pandas as pd
 from utils.preprocessing import NUMBER_COLUMN_NAMES, STD_NUMBER_COLUMN_NAMES
+from utils.paths import get_root_folder
 
 
 def load_data(piece='D960', filter='unstd'):
-    deviations_path = os.path.join(paths.get_root_folder(), 'processed data', piece, 'deviations.json')
+    deviations_path = os.path.join(get_root_folder(), 'processed data', piece, 'deviations.json')
     data = pd.read_json(deviations_path)
 
     # Filtering

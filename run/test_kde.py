@@ -1,22 +1,26 @@
-import numpy as np
-from utils.loading import load_split
-from models.kde import KDE_classifier
-from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
-import seaborn as sn
+import numpy as np
 import pandas as pd
+import seaborn as sn
+from sklearn.metrics import confusion_matrix
+
+from models.kde import KDE_classifier
+from utils.loading import load_split
 from utils.testing import test_classifier, compute_accuracy
 
 PERFORMERS = [f'p{i}' for i in range(11)]
-
+SAMPLE_SIZE = 100
+SAMPLE_OFFSET = 25
 bandwidth = 0.1
 n_samples = 100
-weights = np.array([0.0001,0.0004,0.2565,0.1705,0.2924,0.9177,0.4494])
+weights = np.array([0.0001, 0.0004, 0.2565, 0.1705, 0.2924, 0.9177, 0.4494])
 weights_2 = np.array([0.0005, 0.0006, 0.1743, 0.1182, 0.2179, 0.7752, 0.7750])
-train, test = load_split()
-cl = KDE_classifier(train, PERFORMERS, weights=weights_2, bandwidth=bandwidth, n_samples=n_samples)
+weights_3 = np.array([0.0008, 0.0001, 0.2954, 0.2238, 0.5822, 0.8793, 0.6488])
 
-y_true, y_pred = test_classifier(cl, test)
+train, test = load_split()
+cl = KDE_classifier(train, PERFORMERS, weights=weights_3, bandwidth=bandwidth, n_samples=n_samples)
+
+y_true, y_pred = test_classifier(cl, test, SAMPLE_SIZE, SAMPLE_OFFSET)
 
 accuracy = compute_accuracy(y_true, y_pred)
 print(accuracy)

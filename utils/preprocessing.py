@@ -64,12 +64,15 @@ def get_notes_df(file_path: str) -> pd.DataFrame:
 
 
 def get_notes_df_from_all_match_files(piece: str) -> pd.DataFrame:
-    match_path = os.path.join(paths.get_root_folder(), 'processed data', piece, 'match')
+    match_path = os.path.join(paths.get_root_folder(), 'data', 'processed', piece, 'match')
     performances = paths.get_files(match_path)
     all_notes = pd.DataFrame()
     for match_filename in performances:
-        performance = match_filename.split('_')[0]
-        performer = performance.split('-')[0]
+        if 'score' in match_filename:
+            performer = 'score'
+        else:
+            performance = match_filename.split('_')[0]
+            performer = performance.split('-')[0]
         match_filepath = os.path.join(match_path, match_filename)
         new_notes = get_notes_df(match_filepath)
         new_notes['performer'] = performer
@@ -81,24 +84,23 @@ def get_notes_df_from_all_match_files(piece: str) -> pd.DataFrame:
 def compute_average_performance(notes: pd.DataFrame) -> pd.DataFrame:
     averages = notes.groupby(by=notes['note_id']).mean()
     stds = notes.groupby(by=notes['note_id']).std()
-    return averages[NUMBER_COLUMN_NAMES].join(stds[NUMBER_COLUMN_NAMES], lsuffix='_avg', rsuffix='_std')
+    return averages[NUMBER_COLUMN_NAMES].join(stds[NUMBER_COLUMN_NAMES], lsuffix='', rsuffix='_std')
 
 
-def compute_deviations(notes: pd.DataFrame, average: pd.DataFrame) -> pd.DataFrame:
+def compute_deviations(notes: pd.DataFrame, reference: pd.DataFrame) -> pd.DataFrame:
     deviations = pd.DataFrame()
     for performer in notes['performer'].unique():
         new_deviations = pd.DataFrame()
         performer_notes = notes[notes['performer'] == performer].set_index('note_id')
-        for i, column in enumerate(NUMBER_COLUMN_NAMES):
-            new_deviations[column] = performer_notes[column] - average[AVERAGE_NUMBER_COLUMN_NAMES[i]]
-            new_deviations[column + '_std'] = new_deviations[column] / average[STD_NUMBER_COLUMN_NAMES[i]]
+        for column in NUMBER_COLUMN_NAMES:
+            new_deviations[column] = performer_notes[column] - reference[column]
 
-        # Filter out values that are present in avg, but not in the given performance
-        mask = average.index.isin(new_deviations.index)
-        filtered_deviations = new_deviations[mask]
+        # Filter out values that are present in reference, but not in the given performance
+        mask = new_deviations.index.isin(performer_notes.index)
+        filtered_deviations = pd.DataFrame(new_deviations[mask])
 
         filtered_deviations['performer'] = performer
-        uid = performer + '-' + pd.Series(new_deviations.index)
+        uid = performer + '-' + pd.Series(filtered_deviations.index)
 
         df = filtered_deviations.set_index(uid)
 

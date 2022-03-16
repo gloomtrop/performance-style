@@ -1,0 +1,8 @@
+# Con Espressione Dataset is not pushed to git
+# Download it from: https://zenodo.org/record/3968828#.YiavShNBxGo
+
+# Everything should be disregarded...
+*
+
+# ...except the .gitignore file
+!.gitignore

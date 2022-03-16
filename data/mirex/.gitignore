@@ -1,8 +1,0 @@
-# MIREX is not pushed to git
-# Download it from: https://www.kaggle.com/imsparsh/multimodal-mirex-emotion-dataset
-
-# Everything should be disregarded...
-*
-
-# ...except the .gitignore file
-!.gitignore

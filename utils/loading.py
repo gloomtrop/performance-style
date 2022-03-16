@@ -1,29 +1,24 @@
 import os
+
 import pandas as pd
-from utils.preprocessing import NUMBER_COLUMN_NAMES, STD_NUMBER_COLUMN_NAMES
+
 from utils.paths import get_root_folder
 
 
-def load_data(piece='D960', filter='unstd'):
-    deviations_path = os.path.join(get_root_folder(), 'processed data', piece, 'deviations.json')
-    data = pd.read_json(deviations_path)
-
-    # Filtering
-    if filter == 'std':
-        columns = STD_NUMBER_COLUMN_NAMES + ['performer']
-    elif filter == 'unstd':
-        columns = NUMBER_COLUMN_NAMES + ['performer']
+def load_data(piece='D960', deviation_from='average'):
+    if deviation_from == 'average':
+        file_name = 'deviations_from_average.json'
     else:
-        columns = NUMBER_COLUMN_NAMES + STD_NUMBER_COLUMN_NAMES + ['performer']
+        file_name = 'deviations_from_score.json'
+    path = os.path.join(get_root_folder(), 'data', 'processed', piece, file_name)
+    return pd.read_json(path)
 
-    return data[columns]
 
-
-def load_split(piece='D960', split=0.8, filter='unstd'):
+def load_split(piece='D960', split=0.8, deviation_from='average'):
     training_data = pd.DataFrame()
     test_data = pd.DataFrame()
 
-    data = load_data(piece, filter)
+    data = load_data(piece, deviation_from)
 
     for performer in data['performer'].unique():
         performer_mask = data['performer'] == performer

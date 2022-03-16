@@ -1,17 +1,17 @@
 from copy import deepcopy
+
 import dash
+import numpy as np
+import plotly.figure_factory as ff
+import scipy
 from dash import dcc
 from dash import html
-from dash.dependencies import Input, Output, State
-from dash_folder.template import assets_folder, colors
-import plotly.figure_factory as ff
+from dash.dependencies import Input, Output
 from sklearn.neighbors import KernelDensity
-from utils.loading import load_split
+
+from dash_folder.template import assets_folder
 from utils.dash import get_trigger
-import os
-import pandas as pd
-import numpy as np
-import scipy
+from utils.loading import load_split
 
 app = dash.Dash(__name__, assets_folder=assets_folder, title='KDE')
 RUN_PORT = 8058
@@ -19,9 +19,11 @@ RUN_PORT = 8058
 PERFORMERS = [f'p{i}' for i in range(11)]
 START_PERFORMER = 0
 
-COLUMNS = ['time_onset', 'time_offset', 'velocity_onset', 'velocity_offset', 'duration', 'inter_onset_interval', 'offset_time_duration']
+COLUMNS = ['time_onset', 'time_offset', 'velocity_onset', 'velocity_offset', 'duration', 'inter_onset_interval',
+           'offset_time_duration']
 STD_COLUMNS = [name + '_standardized' for name in COLUMNS]
-LABELS = ['Onset Time', 'Offset Time', 'Onset Velocity', 'Offset Velocity', 'Duration', 'Inter Onset Interval', 'Offset Time Duration']
+LABELS = ['Onset Time', 'Offset Time', 'Onset Velocity', 'Offset Velocity', 'Duration', 'Inter Onset Interval',
+          'Offset Time Duration']
 
 TEST_AMOUNT = 100
 GENERATE_POINTS = True
@@ -38,7 +40,6 @@ COLORS = ['#333F44', '#37AA9C', '#94F3E4', '#33AA99', '#99FFEE', '#333F44', '#37
 
 DIMENSION_OPTIONS = [{'label': l, 'value': v} for (l, v) in zip(LABELS, COLUMNS)]
 PERFORMER_OPTIONS = [{'label': p, 'value': p} for p in PERFORMERS]
-
 
 
 def compute_entropies(sample_distributions, performer_distributions):

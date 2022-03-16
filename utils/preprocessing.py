@@ -1,6 +1,10 @@
-import pandas as pd
-from utils import paths
 import os
+
+import numpy as np
+import pandas as pd
+
+from utils import paths
+from utils.testing import chunker
 
 MATCH_COLUMN_NAMES = ['id', 'time_onset', 'time_offset', 'pitch', 'velocity_onset', 'velocity_offset', 'channel',
                       'match_status', 'time_score', 'note_id', 'error_index', 'skip_index']
@@ -89,7 +93,6 @@ def compute_deviations(notes: pd.DataFrame, average: pd.DataFrame) -> pd.DataFra
             new_deviations[column] = performer_notes[column] - average[AVERAGE_NUMBER_COLUMN_NAMES[i]]
             new_deviations[column + '_std'] = new_deviations[column] / average[STD_NUMBER_COLUMN_NAMES[i]]
 
-
         # Filter out values that are present in avg, but not in the given performance
         mask = average.index.isin(new_deviations.index)
         filtered_deviations = new_deviations[mask]
@@ -101,3 +104,17 @@ def compute_deviations(notes: pd.DataFrame, average: pd.DataFrame) -> pd.DataFra
 
         deviations = pd.concat([deviations, df])
     return deviations
+
+
+def transform_data(data, chunk_size=50, chunk_offset=25):
+    X = []
+    y = []
+    for performer in data['performer'].unique():
+        performer_mask = data['performer'] == performer
+        performer_test = data[performer_mask].reset_index(drop=True).drop(columns=['performer'])
+
+        for chunk in chunker(performer_test, chunk_size, chunk_offset):
+            y.append(performer)
+            X.append(chunk.to_numpy().flatten())
+
+    return np.array(X), np.array(y)

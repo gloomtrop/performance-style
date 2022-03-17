@@ -5,6 +5,11 @@ import pandas as pd
 from utils.paths import get_root_folder
 
 
+def load_notes(piece='D960'):
+    notes_path = os.path.join(get_root_folder(), 'data', 'processed', piece, 'notes.json')
+    return pd.read_json(notes_path)
+
+
 def load_data(piece='D960', deviation_from='average'):
     if deviation_from == 'average':
         file_name = 'deviations_from_average.json'

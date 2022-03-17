@@ -20,17 +20,18 @@ DEVIATIONS_FROM_SCORE_FILEPATH = os.path.join(PATH, 'deviations_from_score.json'
 
 # Processing
 notes = get_notes_df_from_all_match_files(PIECE)
+print('Notes are extracted from the match files')
 
 score_mask = notes['performer'] == 'score'
 score_notes = pd.DataFrame(notes[score_mask])
 performer_notes = pd.DataFrame(notes[~score_mask])
 
 average = compute_average_performance(performer_notes)
+print('Average is computed')
 
 average_deviations = compute_deviations(performer_notes, average)
 score_deviations = compute_deviations(performer_notes, score_notes.set_index('note_id'))
-
-print('Data is computed')
+print('Deviations from average and score are computed')
 
 # Saving
 if SAVE:

@@ -1,18 +1,19 @@
 import pandas as pd
 
 from utils.paths import processed_data_path
+from utils.preprocessing import NOTES_FILENAME, DEVIATIONS_FROM_SCORE_FILENAME, DEVIATIONS_FROM_AVERAGE_FILENAME
 
 
 def load_notes(piece='D960'):
-    notes_path = processed_data_path(piece, 'notes.json')
+    notes_path = processed_data_path(piece, NOTES_FILENAME)
     return pd.read_json(notes_path)
 
 
 def load_data(piece='D960', deviation_from='average'):
     if deviation_from == 'average':
-        file_name = 'deviations_from_average.json'
+        file_name = DEVIATIONS_FROM_AVERAGE_FILENAME
     else:
-        file_name = 'deviations_from_score.json'
+        file_name = DEVIATIONS_FROM_SCORE_FILENAME
     path = processed_data_path(piece, file_name)
     return pd.read_json(path)
 

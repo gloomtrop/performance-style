@@ -1,22 +1,13 @@
-import os
-
 import pandas as pd
 
-from utils.paths import get_root_folder
+from utils.paths import processed_data_path
+from utils.preprocessing import NOTES_FILENAME, AVERAGE_FILENAME, DEVIATIONS_FROM_AVERAGE_FILENAME, \
+    DEVIATIONS_FROM_SCORE_FILENAME
 from utils.preprocessing import get_notes_df_from_all_match_files, compute_average_performance, \
     compute_deviations
 
 PIECE = 'D960'
-SAVE = False
-
-# Paths
-PATH = os.path.join(get_root_folder(), 'data', 'processed', PIECE)
-
-SCORE_FILEPATH = os.path.join(PATH, 'match', 'score_match.txt')
-NOTES_FILEPATH = os.path.join(PATH, 'notes.json')
-AVERAGE_FILEPATH = os.path.join(PATH, 'avg.json')
-DEVIATIONS_FROM_AVERAGE_FILEPATH = os.path.join(PATH, 'deviations_from_average.json')
-DEVIATIONS_FROM_SCORE_FILEPATH = os.path.join(PATH, 'deviations_from_score.json')
+SAVE = True
 
 # Processing
 notes = get_notes_df_from_all_match_files(PIECE)
@@ -35,8 +26,8 @@ print('Deviations from average and score are computed')
 
 # Saving
 if SAVE:
-    notes.to_json(NOTES_FILEPATH)
-    average.to_json(AVERAGE_FILEPATH)
-    average_deviations.to_json(DEVIATIONS_FROM_AVERAGE_FILEPATH)
-    score_deviations.to_json(DEVIATIONS_FROM_SCORE_FILEPATH)
+    notes.to_json(processed_data_path(PIECE, NOTES_FILENAME))
+    average.to_json(processed_data_path(PIECE, AVERAGE_FILENAME))
+    average_deviations.to_json(processed_data_path(PIECE, DEVIATIONS_FROM_AVERAGE_FILENAME))
+    score_deviations.to_json(processed_data_path(PIECE, DEVIATIONS_FROM_SCORE_FILENAME))
     print('Files are saved')

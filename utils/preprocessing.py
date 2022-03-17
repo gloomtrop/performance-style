@@ -14,6 +14,11 @@ NUMBER_COLUMN_NAMES = ['time_onset', 'time_offset', 'velocity_onset', 'velocity_
 AVERAGE_NUMBER_COLUMN_NAMES = [name + '_avg' for name in NUMBER_COLUMN_NAMES]
 STD_NUMBER_COLUMN_NAMES = [name + '_std' for name in NUMBER_COLUMN_NAMES]
 
+NOTES_FILENAME = 'notes.json'
+AVERAGE_FILENAME = 'average.json'
+DEVIATIONS_FROM_AVERAGE_FILENAME = 'deviations_from_average.json'
+DEVIATIONS_FROM_SCORE_FILENAME = 'deviations_from_score.json'
+
 
 def get_notes_df(file_path: str) -> pd.DataFrame:
     lines = []

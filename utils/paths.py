@@ -24,11 +24,12 @@ def raw_midi_path(piece, *args):
 
 
 def processed_data_path(piece, *args):
-    return path_from_root('data', 'processed', piece, *args)
+    return path_from_root('data', 'processed', 'schubert', piece, *args)
 
 
 def match_path(piece, *args):
     return path_from_root('data', 'processed', piece, 'match', *args)
 
 
-ALIGNMENT_FOLDER_PATH = path_from_root('external', 'AlignmentTool')
+def alignment_path(*args):
+    return path_from_root('external', 'AlignmentTool', *args)

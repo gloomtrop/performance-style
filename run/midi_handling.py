@@ -1,10 +1,10 @@
-import os
+from utils.midi import get_midi_df
+from utils.paths import raw_midi_path
 
-from utils import paths, midi
+PIECE = 'D960'
+FILENAME = 'p3-0.MID'
 
-d960_folder = os.path.join(paths.get_root_folder(), 'data', 'raw', 'schubert', 'D960')
-file_name = 'p3-0.MID'
-file_path = os.path.join(d960_folder, file_name)
+file_path = raw_midi_path(PIECE, FILENAME)
 
-df = midi.get_midi_df(file_path)
+df = get_midi_df(file_path)
 print(df)

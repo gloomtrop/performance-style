@@ -7,7 +7,7 @@ from utils.preprocessing import get_notes_df_from_all_match_files, compute_avera
     compute_deviations
 
 PIECE = 'D960'
-SAVE = True
+SAVE = False
 
 # Paths
 PATH = os.path.join(get_root_folder(), 'data', 'processed', PIECE)

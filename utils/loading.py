@@ -1,12 +1,10 @@
-import os
-
 import pandas as pd
 
-from utils.paths import get_root_folder
+from utils.paths import processed_data_path
 
 
 def load_notes(piece='D960'):
-    notes_path = os.path.join(get_root_folder(), 'data', 'processed', piece, 'notes.json')
+    notes_path = processed_data_path(piece, 'notes.json')
     return pd.read_json(notes_path)
 
 
@@ -15,7 +13,7 @@ def load_data(piece='D960', deviation_from='average'):
         file_name = 'deviations_from_average.json'
     else:
         file_name = 'deviations_from_score.json'
-    path = os.path.join(get_root_folder(), 'data', 'processed', piece, file_name)
+    path = processed_data_path(piece, file_name)
     return pd.read_json(path)
 
 

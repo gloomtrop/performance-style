@@ -1,9 +1,7 @@
-import os
-
 import numpy as np
 import pandas as pd
 
-from utils import paths
+from utils.paths import match_path, get_files
 from utils.testing import chunker
 
 MATCH_COLUMN_NAMES = ['id', 'time_onset', 'time_offset', 'pitch', 'velocity_onset', 'velocity_offset', 'channel',
@@ -64,8 +62,8 @@ def get_notes_df(file_path: str) -> pd.DataFrame:
 
 
 def get_notes_df_from_all_match_files(piece: str) -> pd.DataFrame:
-    match_path = os.path.join(paths.get_root_folder(), 'data', 'processed', piece, 'match')
-    performances = paths.get_files(match_path)
+    match_folder_path = match_path(piece)
+    performances = get_files(match_folder_path)
     all_notes = pd.DataFrame()
     for match_filename in performances:
         if 'score' in match_filename:
@@ -73,7 +71,7 @@ def get_notes_df_from_all_match_files(piece: str) -> pd.DataFrame:
         else:
             performance = match_filename.split('_')[0]
             performer = performance.split('-')[0]
-        match_filepath = os.path.join(match_path, match_filename)
+        match_filepath = match_path(piece, match_filename)
         new_notes = get_notes_df(match_filepath)
         new_notes['performer'] = performer
         new_notes['uid'] = performer + '-' + new_notes['note_id']

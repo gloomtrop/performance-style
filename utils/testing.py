@@ -1,4 +1,3 @@
-
 def compute_accuracy(y_true, y_pred):
     equal = [t == p for t, p in zip(y_true, y_pred)]
     return sum(equal) / len(equal)

@@ -19,6 +19,8 @@ AVERAGE_FILENAME = 'average.json'
 DEVIATIONS_FROM_AVERAGE_FILENAME = 'deviations_from_average.json'
 DEVIATIONS_FROM_SCORE_FILENAME = 'deviations_from_score.json'
 
+PERFORMERS = [f'p{i}' for i in range(11)]
+
 
 def get_notes_df(file_path: str) -> pd.DataFrame:
     lines = []
@@ -117,9 +119,9 @@ def transform_data(data, chunk_size=50, chunk_offset=25):
     for performer in data['performer'].unique():
         performer_mask = data['performer'] == performer
         performer_test = data[performer_mask].reset_index(drop=True).drop(columns=['performer'])
-
+        performer_id = PERFORMERS.index(performer)
         for chunk in chunker(performer_test, chunk_size, chunk_offset):
-            y.append(performer)
-            X.append(chunk.to_numpy().flatten())
+            y.append(performer_id)
+            X.append(chunk.to_numpy().transpose().flatten())
 
     return np.array(X), np.array(y)

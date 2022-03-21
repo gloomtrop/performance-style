@@ -1,6 +1,6 @@
-from sklearn.neighbors import KernelDensity
 import numpy as np
 import scipy
+from sklearn.neighbors import KernelDensity
 
 
 class KDE_classifier:
@@ -16,6 +16,11 @@ class KDE_classifier:
             self.weights = weights
         else:
             self.weights = np.ones(len(training_data.columns) - 1)
+
+    def train(self, training_data):
+        self.min_value = training_data.min()
+        self.max_value = training_data.max()
+        self.performer_distributions = self.get_performer_distributions(training_data)
 
     def predict(self, X):
         sample_distributions = self.get_sample_distributions(X)

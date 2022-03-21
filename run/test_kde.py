@@ -11,14 +11,14 @@ from utils.testing import test_classifier, compute_accuracy
 PERFORMERS = [f'p{i}' for i in range(11)]
 SAMPLE_SIZE = 100
 SAMPLE_OFFSET = 25
-bandwidth = 0.1
-n_samples = 100
-weights = np.array([0.0001, 0.0004, 0.2565, 0.1705, 0.2924, 0.9177, 0.4494])
-weights_2 = np.array([0.0005, 0.0006, 0.1743, 0.1182, 0.2179, 0.7752, 0.7750])
-weights_3 = np.array([0.0008, 0.0001, 0.2954, 0.2238, 0.5822, 0.8793, 0.6488])
+bandwidth = 0.6932785319057954
+n_samples = 56
+weights = np.array(
+    [0.9803701032803395, 0.06889461912880954, 0.07764404791412743, 0.3875642462285485, 0.08259937926241562,
+     0.6964800043141498, 0.7700041725975063])
 
 train, test = load_split()
-cl = KDE_classifier(train, PERFORMERS, weights=weights_3, bandwidth=bandwidth, n_samples=n_samples)
+cl = KDE_classifier(train, PERFORMERS, weights=weights, bandwidth=bandwidth, n_samples=n_samples)
 
 y_true, y_pred = test_classifier(cl, test, SAMPLE_SIZE, SAMPLE_OFFSET)
 

@@ -1,11 +1,8 @@
 import numpy as np
-import pandas as pd
-import seaborn as sn
-from matplotlib import pyplot as plt
-from sklearn.metrics import confusion_matrix
 
 from models.kde import KDE_classifier
 from utils.loading import load_data, performers_last_name_list
+from utils.plotting import plot_confusion_matrix
 from utils.preprocessing import PERFORMERS
 from utils.testing import compute_accuracy
 from utils.testing import get_kfold_data, test_k_fold
@@ -28,9 +25,4 @@ for fold in range(K):
     y_pred = y_pred + test_k_fold(clf, test[fold], PERFORMERS)
 
 print(compute_accuracy(y_true, y_pred))
-
-cm = confusion_matrix(y_true, y_pred, normalize='true', labels=PERFORMERS)
-cm_df = pd.DataFrame(cm, index=PERFORMER_NAMES, columns=PERFORMER_NAMES)
-plt.figure(figsize=(10, 7))
-sn.heatmap(cm_df, annot=True)
-plt.show()
+plot_confusion_matrix(y_true, y_pred, PERFORMERS, PERFORMER_NAMES)

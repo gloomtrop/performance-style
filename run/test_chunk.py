@@ -1,11 +1,8 @@
-import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
-import seaborn as sn
-from sklearn.metrics import confusion_matrix
 
 from models.kde import KDE_classifier
 from utils.loading import load_split, performers_last_name_list
+from utils.plotting import plot_confusion_matrix
 from utils.testing import test_classifier, compute_accuracy
 
 PERFORMERS = [f'p{i}' for i in range(11)]
@@ -24,9 +21,4 @@ cl = KDE_classifier(train, PERFORMERS, weights=weights, bandwidth=bandwidth, n_s
 y_true, y_pred = test_classifier(cl, test, SAMPLE_SIZE, SAMPLE_OFFSET)
 
 print(compute_accuracy(y_true, y_pred))
-
-cm = confusion_matrix(y_true, y_pred, normalize='true', labels=PERFORMERS)
-cm_df = pd.DataFrame(cm, index=PERFORMER_NAMES, columns=PERFORMER_NAMES)
-plt.figure(figsize=(10, 7))
-sn.heatmap(cm_df, annot=True)
-plt.show()
+plot_confusion_matrix(y_true, y_pred, PERFORMERS, PERFORMER_NAMES)

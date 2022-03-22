@@ -1,3 +1,7 @@
+import pandas as pd
+from sklearn.model_selection import KFold
+
+
 def compute_accuracy(y_true, y_pred):
     equal = [t == p for t, p in zip(y_true, y_pred)]
     return sum(equal) / len(equal)
@@ -22,3 +26,36 @@ def test_classifier(classifier, test_data, chunk_size=50, chunk_offset=25):
             y_pred.append(prediction)
 
     return y_true, y_pred
+
+
+def get_kfold_data(data, k, performers):
+    fold = KFold(n_splits=k, shuffle=True, random_state=2)
+    fold_indices = [list(fold.split(data[data['performer'] == p])) for p in performers]
+    test_data = []
+    training_data = []
+
+    for f in range(k):
+        fold_training_data = pd.DataFrame()
+        fold_test_data = []
+
+        for i, p in enumerate(performers):
+            performer_data = data[data['performer'] == p]
+            train_ids, test_ids = fold_indices[i][f]
+
+            new_training = performer_data.iloc[train_ids]
+            new_test = performer_data.iloc[test_ids]
+
+            fold_training_data = pd.concat([fold_training_data, new_training])
+            fold_test_data.append(new_test)
+
+        training_data.append(fold_training_data)
+        test_data.append(fold_test_data)
+    return training_data, test_data
+
+
+def test_k_fold(clf, test_data, performers):
+    y_pred = []
+    for i, p in enumerate(performers):
+        prediction = clf.predict(test_data[i])
+        y_pred.append(prediction)
+    return y_pred

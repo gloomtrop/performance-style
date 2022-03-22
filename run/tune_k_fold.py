@@ -1,46 +1,11 @@
 import numpy as np
 import optuna
-import pandas as pd
-from sklearn.model_selection import KFold
 
 from models.kde import KDE_classifier
 from utils.loading import load_data
 from utils.preprocessing import NUMBER_COLUMN_NAMES, PERFORMERS
 from utils.testing import compute_accuracy
-
-
-def get_kfold_data(data, k, PERFORMERS, ):
-    fold = KFold(n_splits=k, shuffle=True, random_state=2)
-    fold_indices = [list(fold.split(data[data['performer'] == p])) for p in PERFORMERS]
-    test_data = []
-    training_data = []
-
-    for f in range(k):
-        fold_training_data = pd.DataFrame()
-        fold_test_data = []
-
-        for i, p in enumerate(PERFORMERS):
-            performer_data = data[data['performer'] == p]
-            train_ids, test_ids = fold_indices[i][f]
-
-            new_training = performer_data.iloc[train_ids]
-            new_test = performer_data.iloc[test_ids]
-
-            fold_training_data = pd.concat([fold_training_data, new_training])
-            fold_test_data.append(new_test)
-
-        training_data.append(fold_training_data)
-        test_data.append(fold_test_data)
-    return training_data, test_data
-
-
-def test_k_fold(clf, test_data):
-    y_pred = []
-    for i, p in enumerate(PERFORMERS):
-        prediction = clf.predict(test_data[i])
-        y_pred.append(prediction)
-    return y_pred
-
+from utils.testing import get_kfold_data, test_k_fold
 
 K = 8
 data = load_data()
@@ -56,7 +21,7 @@ def objective(trial):
     y_pred = []
     for fold in range(K):
         clf = KDE_classifier(train[fold], PERFORMERS, weights, bandwidth, n_samples)
-        y_pred = y_pred + test_k_fold(clf, test[fold])
+        y_pred = y_pred + test_k_fold(clf, test[fold], PERFORMERS)
     accuracy = compute_accuracy(y_true, y_pred)
     return 1 - accuracy
 

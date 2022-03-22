@@ -125,3 +125,25 @@ def transform_data(data, chunk_size=50, chunk_offset=25):
             X.append(chunk.to_numpy().transpose().flatten())
 
     return np.array(X), np.array(y)
+
+
+def standardize_df(df, means=None, stds=None):
+    df_values = df.drop(columns=['performer'])
+    if means is None or stds is None:
+        means = df_values.mean()
+        stds = df_values.std()
+
+    standardized = (df_values - means) / stds
+    standardized['performer'] = df['performer']
+    return standardized, means, stds
+
+
+def normalize_df(df, min_values=None, max_values=None):
+    df_values = df.drop(columns=['performer'])
+    if min_values is None or max_values is None:
+        min_values = df_values.min()
+        max_values = df_values.max()
+
+    norm = (df_values - min_values) / (max_values - min_values)
+    norm['performer'] = df['performer']
+    return norm, min_values, max_values

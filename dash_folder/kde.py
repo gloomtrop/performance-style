@@ -29,8 +29,11 @@ TEST_AMOUNT = 100
 GENERATE_POINTS = True
 GENERATED_AMOUNT = 200
 
-BANDWIDTH = 0.1
-N_SAMPLES = 100
+BANDWIDTH = 0.6932785319057954
+N_SAMPLES = 56
+WEIGHTS = np.array(
+    [0.9803701032803395, 0.06889461912880954, 0.07764404791412743, 0.3875642462285485, 0.08259937926241562,
+     0.6964800043141498, 0.7700041725975063])
 
 SAMPLE_COLOR = '#1df22f'
 POPULATION_COLOR = '#13941e'
@@ -42,10 +45,14 @@ DIMENSION_OPTIONS = [{'label': l, 'value': v} for (l, v) in zip(LABELS, COLUMNS)
 PERFORMER_OPTIONS = [{'label': p, 'value': p} for p in PERFORMERS]
 
 
-def compute_entropies(sample_distributions, performer_distributions):
+def compute_entropy_matrix(performer_distributions, sample_distributions):
     return np.array(
         [[scipy.stats.entropy(sample_distributions[i], pdist[i]) for i in range(len(sample_distributions))] for
          pdist in performer_distributions])
+
+
+def sum_entropies(entropy_matrix, weights):
+    return np.dot(entropy_matrix, weights)
 
 
 def get_sample_distributions(df, bandwidth, min_value, max_value, n_samples):
@@ -104,7 +111,8 @@ sample = test[test['performer'] == PERFORMERS[START_PERFORMER]][:TEST_AMOUNT]
 
 sdist, sX = get_sample_distributions(sample, BANDWIDTH, min_value, max_value, N_SAMPLES)
 
-entropies = compute_entropies(sdist, pdist)
+matrix = compute_entropy_matrix(pdist, sdist)
+entropies = sum_entropies(matrix, WEIGHTS)
 pX_transposed = list(map(list, zip(*pX)))
 
 app.layout = html.Div([
@@ -159,6 +167,7 @@ app.layout = html.Div([
               Input('sample-performer', 'value'))
 def change_piece_options(dimension, performer):
     global sX
+    global matrix
     global entropies
     trigger = get_trigger()
 
@@ -171,16 +180,16 @@ def change_piece_options(dimension, performer):
     if trigger == 'sample-performer':
         sample = test[test['performer'] == PERFORMERS[performer_id]][:TEST_AMOUNT]
         sdist, sX = get_sample_distributions(sample, BANDWIDTH, min_value, max_value, N_SAMPLES)
-        entropies = compute_entropies(sdist, pdist)
+        matrix = compute_entropy_matrix(pdist, sdist)
 
     histograms = pX_transposed[dimension_id] + [sX[dimension_id]]
     names = []
-    for i, entropy in enumerate(entropies.transpose()[dimension_id]):
+    for i, entropy in enumerate(matrix.transpose()[dimension_id]):
         names.append(f'{PERFORMERS[i]} - {entropy:.2f}')
     names += ['Sa']
 
-    summed_entropies = [sum(e) for e in entropies]
-    classified_performer = classify_performer(summed_entropies)
+    entropies = sum_entropies(matrix, WEIGHTS)
+    classified_performer = classify_performer(entropies)
 
     if classified_performer == performer:
         style = {

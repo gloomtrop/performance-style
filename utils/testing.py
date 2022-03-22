@@ -10,7 +10,7 @@ def compute_accuracy(y_true, y_pred):
 def chunker(seq, size, offset):
     positions = list(range(0, len(seq) - 1, offset))
     filtered = filter(lambda pos: pos + size < seq.shape[0], positions)
-    return (seq.iloc[pos:pos + size] for pos in filtered)
+    return [seq.iloc[pos:pos + size] for pos in filtered]
 
 
 def test_classifier(classifier, test_data, chunk_size=50, chunk_offset=25):

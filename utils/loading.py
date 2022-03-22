@@ -1,7 +1,10 @@
 import pandas as pd
 
-from utils.paths import processed_data_path
+from utils.paths import processed_data_path, path_from_root
 from utils.preprocessing import NOTES_FILENAME, DEVIATIONS_FROM_SCORE_FILENAME, DEVIATIONS_FROM_AVERAGE_FILENAME
+
+META_FILENAME = 'meta.json'
+META_PATH = path_from_root('data', 'raw', 'schubert', META_FILENAME)
 
 
 def load_notes(piece='D960'):
@@ -32,3 +35,19 @@ def load_split(piece='D960', split=0.8, deviation_from='average'):
         test_data = pd.concat([test_data, performer_data[length:]])
 
     return training_data, test_data
+
+
+def load_performers(piece='D960'):
+    performers = pd.read_json(META_PATH)
+    piece_mask = performers['piece'] == piece
+    return performers[piece_mask]
+
+
+def performers_full_name_list(piece='D960'):
+    perf_df = load_performers(piece)
+    return list(perf_df['name'].to_numpy())
+
+
+def performers_last_name_list(piece='D960'):
+    perf_full = performers_full_name_list(piece)
+    return [name.split()[-1] for name in perf_full]

@@ -5,10 +5,11 @@ import seaborn as sn
 from sklearn.metrics import confusion_matrix
 
 from models.kde import KDE_classifier
-from utils.loading import load_split
+from utils.loading import load_split, performers_last_name_list
 from utils.testing import test_classifier, compute_accuracy
 
 PERFORMERS = [f'p{i}' for i in range(11)]
+PERFORMER_NAMES = performers_last_name_list()
 SAMPLE_SIZE = 100
 SAMPLE_OFFSET = 25
 bandwidth = 0.6932785319057954
@@ -22,11 +23,10 @@ cl = KDE_classifier(train, PERFORMERS, weights=weights, bandwidth=bandwidth, n_s
 
 y_true, y_pred = test_classifier(cl, test, SAMPLE_SIZE, SAMPLE_OFFSET)
 
-accuracy = compute_accuracy(y_true, y_pred)
-print(accuracy)
+print(compute_accuracy(y_true, y_pred))
 
 cm = confusion_matrix(y_true, y_pred, normalize='true', labels=PERFORMERS)
-cm_df = pd.DataFrame(cm, index=PERFORMERS, columns=PERFORMERS)
+cm_df = pd.DataFrame(cm, index=PERFORMER_NAMES, columns=PERFORMER_NAMES)
 plt.figure(figsize=(10, 7))
 sn.heatmap(cm_df, annot=True)
 plt.show()

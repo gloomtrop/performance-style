@@ -1,12 +1,13 @@
+import optuna
 import torch
 from torch.nn import CrossEntropyLoss
 from torch.optim import Adam
 from torch.utils.data import DataLoader
 
-import optuna
 from models.rnn import RNN
 from utils.loading import DeviationDataset
 from utils.testing import compute_accuracy
+from utils.training import get_storage, handle_pruning
 
 INPUT_SIZE = 7
 
@@ -14,7 +15,7 @@ NUM_CLASSES = 11
 SEQUENCE_LENGTH = 50
 SEQUENCE_OFFSET = 10
 BATCH_SIZE = 25
-EPOCHS = 30
+EPOCHS = 10
 
 criterion = CrossEntropyLoss()
 
@@ -27,8 +28,8 @@ valloader = DataLoader(val, batch_size=BATCH_SIZE,
 
 
 def objective(trial):
-    lr = trial.suggest_float('lr', 0.001, 0.1, log=True)
-    hidden_size = trial.suggest_int('hidden size', 10, 100, log=True)
+    lr = trial.suggest_float('lr', 1e-6, 1e-2, log=True)
+    hidden_size = trial.suggest_int('hidden size', 70, 120, log=True)
     num_layers = trial.suggest_int('num layers', 1, 4)
 
     model = RNN(INPUT_SIZE, hidden_size, num_layers, NUM_CLASSES)
@@ -61,19 +62,10 @@ def objective(trial):
             y_pred += torch.argmax(outputs, dim=1)
 
         accuracy = float(compute_accuracy(y_true, y_pred))
+        handle_pruning(trial, accuracy, epoch)
 
-        trial.report(accuracy, epoch)
-
-        if trial.should_prune():
-            raise optuna.exceptions.TrialPruned()
     return accuracy
 
 
-db_name = "sqlite:///db.sqlite3"
-
-storage = optuna.storages.RDBStorage(
-    url=db_name,
-)
-
-study = optuna.load_study(study_name='RNN', storage=storage)
+study = optuna.load_study(study_name='RNN', storage=get_storage())
 study.optimize(objective, n_trials=100)

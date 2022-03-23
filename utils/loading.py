@@ -1,6 +1,6 @@
 import pandas as pd
 import torch
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, random_split
 
 from utils.paths import processed_data_path, path_from_root
 from utils.preprocessing import NOTES_FILENAME, DEVIATIONS_FROM_SCORE_FILENAME, DEVIATIONS_FROM_AVERAGE_FILENAME, \
@@ -44,6 +44,11 @@ class DeviationDataset(Dataset):
     def __len__(self):
         return self.len
 
+    def split(self, ratio=0.9):
+        first = int(ratio * self.__len__())
+        second = self.__len__() - first
+        return random_split(self, [first, second])
+
 
 def load_notes(piece='D960'):
     notes_path = processed_data_path(piece, NOTES_FILENAME)
@@ -56,7 +61,7 @@ def load_data(piece='D960', deviation_from='average'):
     else:
         file_name = DEVIATIONS_FROM_SCORE_FILENAME
     path = processed_data_path(piece, file_name)
-    return pd.read_json(path)
+    return pd.read_json(path).dropna()
 
 
 def load_split(piece='D960', split=0.8, deviation_from='average'):

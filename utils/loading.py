@@ -32,9 +32,9 @@ class DeviationDataset(Dataset):
             performer_id = PERFORMERS.index(performer)
             y_true = torch.zeros(output_length)
             y_true[performer_id] = 1
-            
+
             for chunk in chunker(performer_data, sequence_size, sequence_offset):
-                self.x.append(torch.from_numpy(chunk.to_numpy()))
+                self.x.append(torch.from_numpy(chunk.to_numpy()).float())
                 self.y.append(y_true)
         self.len = len(self.y)
 

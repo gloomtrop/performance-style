@@ -1,11 +1,13 @@
 import os
 
+from dotenv import load_dotenv
 from optuna.exceptions import TrialPruned
 from optuna_dashboard import run_server
 
 
 def get_storage():
-    storage = os.environ.get('database_url')
+    load_dotenv()
+    storage = os.getenv('database_url')
     if not storage:
         raise ValueError('You have not set database_url as an environment variable')
     else:

@@ -3,6 +3,7 @@ import torch
 from torch.nn import CrossEntropyLoss
 from torch.optim import Adam
 from torch.utils.data import DataLoader
+from tqdm import trange
 
 from models.rnn import RNN
 from utils.loading import DeviationDataset
@@ -37,7 +38,7 @@ def objective(trial):
     optimizer = Adam(params=model.parameters(), lr=lr)
 
     accuracy = 0
-    for epoch in range(EPOCHS):
+    for epoch in trange(EPOCHS):
         model.train()
         for i, data in enumerate(trainloader):
             # get the inputs; data is a list of [inputs, labels]

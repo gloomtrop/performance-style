@@ -19,8 +19,6 @@ test_loader = DataLoader(dataset, batch_size=BATCH_SIZE)
 y_true = []
 y_pred = []
 
-print('Start modelling')
-print(len(test_loader))
 for i, data in enumerate(test_loader):
     inputs, label = data
     outputs = model(inputs)

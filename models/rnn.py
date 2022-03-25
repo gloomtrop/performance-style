@@ -28,13 +28,15 @@ class RNN(nn.Module):
 
         return self.fc(out)
 
-    def save(self, path):
+    def save(self, path, **kwargs):
         save_dict = {
             'state_dict': self.state_dict(),
             'class': self.__class__,
             'input_arguments': self.input_arguments
         }
+        save_dict.update(kwargs)
         torch.save(save_dict, path)
+        print(f'Model was saved')
 
 
 class GRU(RNN):

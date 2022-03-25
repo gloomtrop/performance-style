@@ -50,6 +50,13 @@ class DeviationDataset(Dataset):
         return random_split(self, [first, second])
 
 
+def load_model(path):
+    saved_dict = torch.load(path)
+    model = saved_dict['class'](**saved_dict['input_arguments'])
+    model.load_state_dict(saved_dict['state_dict'])
+    return model
+
+
 def load_notes(piece='D960'):
     notes_path = processed_data_path(piece, NOTES_FILENAME)
     return pd.read_json(notes_path)

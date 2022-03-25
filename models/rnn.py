@@ -6,6 +6,11 @@ class RNN(nn.Module):
 
     def __init__(self, input_size, hidden_size, num_layers, num_classes):
         super(RNN, self).__init__()
+
+        self.input_arguments = locals()
+        del self.input_arguments['self']
+        del self.input_arguments['__class__']
+
         self.num_layers = num_layers
         self.hidden_size = hidden_size
         self.rnn = nn.RNN(input_size, hidden_size, num_layers, batch_first=True)
@@ -18,6 +23,14 @@ class RNN(nn.Module):
         out = out[:, -1, :]
 
         return self.fc(out)
+
+    def save(self, path):
+        save_dict = {
+            'state_dict': self.state_dict(),
+            'class': self.__class__,
+            'input_arguments': self.input_arguments
+        }
+        torch.save(save_dict, path)
 
 
 class GRU(nn.Module):

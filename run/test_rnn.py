@@ -1,7 +1,8 @@
 import torch
 from torch.utils.data import DataLoader
 
-from utils.loading import DeviationDataset, load_model
+from datasets.ecomp import ECompetitionDataSet
+from utils.loading import load_model
 from utils.loading import performers_full_name_list
 from utils.paths import path_from_root
 from utils.plotting import plot_confusion_matrix
@@ -13,7 +14,7 @@ BATCH_SIZE = 25
 model = load_model(MODEL_PATH)
 model.eval()
 
-dataset = DeviationDataset()
+dataset = ECompetitionDataSet()
 test_loader = DataLoader(dataset, batch_size=BATCH_SIZE)
 
 y_true = []

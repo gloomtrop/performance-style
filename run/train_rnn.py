@@ -3,8 +3,8 @@ from torch.nn import CrossEntropyLoss
 from torch.optim import Adam
 from torch.utils.data import DataLoader
 
+from datasets.ecomp import ECompetitionDataSet
 from models.rnn import RNN
-from utils.loading import DeviationDataset
 from utils.testing import compute_accuracy
 
 INPUT_SIZE = 7
@@ -24,7 +24,7 @@ model = RNN(INPUT_SIZE, HIDDEN_SIZE, NUM_LAYERS, NUM_CLASSES)
 optimizer = Adam(params=model.parameters(), lr=LEARNING_RATE)
 criterion = CrossEntropyLoss()
 
-dataset = DeviationDataset()
+dataset = ECompetitionDataSet()
 train, val = dataset.split()
 trainloader = DataLoader(train, batch_size=BATCH_SIZE,
                          shuffle=True)

@@ -1,6 +1,6 @@
 import pandas as pd
 
-from utils.paths import processed_data_path
+from utils.paths import processed_ecomp_path
 from utils.preprocessing import NOTES_FILENAME, AVERAGE_FILENAME, DEVIATIONS_FROM_AVERAGE_FILENAME, \
     DEVIATIONS_FROM_SCORE_FILENAME
 from utils.preprocessing import get_notes_df_from_all_match_files, compute_average_performance, \
@@ -26,8 +26,8 @@ print('Deviations from average and score are computed')
 
 # Saving
 if SAVE:
-    notes.to_json(processed_data_path(PIECE, NOTES_FILENAME))
-    average.to_json(processed_data_path(PIECE, AVERAGE_FILENAME))
-    average_deviations.to_json(processed_data_path(PIECE, DEVIATIONS_FROM_AVERAGE_FILENAME))
-    score_deviations.to_json(processed_data_path(PIECE, DEVIATIONS_FROM_SCORE_FILENAME))
+    notes.to_json(processed_ecomp_path(PIECE, NOTES_FILENAME))
+    average.to_json(processed_ecomp_path(PIECE, AVERAGE_FILENAME))
+    average_deviations.to_json(processed_ecomp_path(PIECE, DEVIATIONS_FROM_AVERAGE_FILENAME))
+    score_deviations.to_json(processed_ecomp_path(PIECE, DEVIATIONS_FROM_SCORE_FILENAME))
     print('Files are saved')

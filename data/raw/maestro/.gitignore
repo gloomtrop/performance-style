@@ -1,8 +1,0 @@
-# MAESTRO dataset v3.0.0 is not pushed to git
-# Download it from: https://magenta.tensorflow.org/datasets/maestro#v300
-
-# Everything should be disregarded...
-*
-
-# ...except the .gitignore file
-!.gitignore

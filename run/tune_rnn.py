@@ -5,8 +5,8 @@ from torch.optim import Adam
 from torch.utils.data import DataLoader
 from tqdm import trange
 
+from datasets.ecomp import ECompetitionDataSet
 from models.rnn import LSTM
-from utils.loading import DeviationDataset
 from utils.testing import compute_accuracy
 from utils.training import get_storage, handle_pruning, save_best_end_model
 from utils.training import save_best_intermediary_model, load_best_intermediary_score, \
@@ -34,7 +34,7 @@ best_intermediary_score = load_best_intermediary_score(STUDY_NAME)
 best_end_score = load_best_end_score(STUDY_NAME)
 
 # Dataset and loaders
-dataset = DeviationDataset()
+dataset = ECompetitionDataSet()
 train, val = dataset.split()
 train_loader = DataLoader(train, batch_size=BATCH_SIZE,
                           shuffle=True)

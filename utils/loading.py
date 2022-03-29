@@ -1,53 +1,16 @@
 import pandas as pd
 import torch
-from torch.utils.data import Dataset, random_split
 
-from utils.paths import processed_data_path, path_from_root
-from utils.preprocessing import NOTES_FILENAME, DEVIATIONS_FROM_SCORE_FILENAME, DEVIATIONS_FROM_AVERAGE_FILENAME, \
-    standardize_df, normalize_df, PERFORMERS
-from utils.testing import chunker
+from utils.paths import processed_ecomp_path, path_from_root, processed_labelled_path
+from utils.preprocessing import NOTES_FILENAME, DEVIATIONS_FROM_SCORE_FILENAME, DEVIATIONS_FROM_AVERAGE_FILENAME
 
 META_FILENAME = 'meta.json'
-META_PATH = path_from_root('data', 'raw', 'schubert', META_FILENAME)
+META_PATH = path_from_root('data', 'raw', 'e_competition', META_FILENAME)
 
 
-class DeviationDataset(Dataset):
-    def __init__(self, piece='D960', deviation_type='average', processing=None, sequence_size=50, sequence_offset=10):
-        data = load_data(piece, deviation_from=deviation_type)
-
-        if processing == 'standardized':
-            data = standardize_df(data)
-        elif processing == 'normalized':
-            data = normalize_df(data)
-
-        self.x = []
-        self.y = []
-
-        output_length = len(PERFORMERS)
-
-        for performer in data['performer'].unique():
-            performer_mask = data['performer'] == performer
-            performer_data = data[performer_mask].reset_index(drop=True).drop(columns=['performer'])
-
-            performer_id = PERFORMERS.index(performer)
-            y_true = torch.zeros(output_length)
-            y_true[performer_id] = 1
-
-            for chunk in chunker(performer_data, sequence_size, sequence_offset):
-                self.x.append(torch.from_numpy(chunk.to_numpy()).float())
-                self.y.append(y_true)
-        self.len = len(self.y)
-
-    def __getitem__(self, index):
-        return self.x[index], self.y[index]
-
-    def __len__(self):
-        return self.len
-
-    def split(self, ratio=0.9):
-        first = int(ratio * self.__len__())
-        second = self.__len__() - first
-        return random_split(self, [first, second])
+def load_labelled_data():
+    labels_path = processed_labelled_path('data.json')
+    return pd.read_json(labels_path)
 
 
 def load_model(path):
@@ -58,7 +21,7 @@ def load_model(path):
 
 
 def load_notes(piece='D960'):
-    notes_path = processed_data_path(piece, NOTES_FILENAME)
+    notes_path = processed_ecomp_path(piece, NOTES_FILENAME)
     return pd.read_json(notes_path)
 
 
@@ -67,7 +30,7 @@ def load_data(piece='D960', deviation_from='average'):
         file_name = DEVIATIONS_FROM_AVERAGE_FILENAME
     else:
         file_name = DEVIATIONS_FROM_SCORE_FILENAME
-    path = processed_data_path(piece, file_name)
+    path = processed_ecomp_path(piece, file_name)
     return pd.read_json(path).dropna()
 
 

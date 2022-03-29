@@ -20,11 +20,15 @@ def path_from_root(*args):
 
 
 def raw_midi_path(piece, *args):
-    return path_from_root('data', 'raw', 'schubert', piece, *args)
+    return path_from_root('data', 'raw', 'e_competition', piece, *args)
 
 
-def processed_data_path(piece, *args):
-    return path_from_root('data', 'processed', 'schubert', piece, *args)
+def processed_ecomp_path(piece, *args):
+    return path_from_root('data', 'processed', 'e_competition', piece, *args)
+
+
+def processed_labelled_path(*args):
+    return path_from_root('data', 'processed', 'labelling', *args)
 
 
 def match_path(piece, *args):

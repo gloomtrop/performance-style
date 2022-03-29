@@ -8,7 +8,7 @@ from utils.preprocessing import NOTES_FILENAME, DEVIATIONS_FROM_SCORE_FILENAME, 
 from utils.testing import chunker
 
 META_FILENAME = 'meta.json'
-META_PATH = path_from_root('data', 'raw', 'schubert', META_FILENAME)
+META_PATH = path_from_root('data', 'raw', 'e_competition', META_FILENAME)
 
 
 class DeviationDataset(Dataset):

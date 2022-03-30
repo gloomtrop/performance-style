@@ -2,6 +2,7 @@ import math
 import random
 
 import numpy as np
+import pandas as pd
 import torch
 
 from datasets.subset import DataSubSet
@@ -104,8 +105,10 @@ class ECompetitionDataSet:
                 for chunk in chunker(df, sequence_size, sequence_offset):
                     if output_type == 'tensor':
                         X = torch.from_numpy(chunk.to_numpy()).float()
-                    else:
+                    elif output_type == 'numpy':
                         X = chunk.to_numpy()
+                    else:
+                        X = chunk
                     if data_type == 'test':
                         test_X.append(X)
                         test_y.append(y_true)
@@ -115,6 +118,8 @@ class ECompetitionDataSet:
 
             for (start, end) in zip(training_starts, training_ends):
                 df = performer_data.iloc[start:end, :]
+                if start == end:
+                    continue
                 if chunk_training:
                     for chunk in chunker(df, sequence_size, sequence_offset):
                         if output_type == 'tensor':
@@ -124,9 +129,17 @@ class ECompetitionDataSet:
                         train_X.append(X)
                         train_y.append(y_true)
                 else:
-                    train_X.append(df)
-                    train_y.append(y_true)
-
-        self.train = DataSubSet(train_X, train_y)
-        self.validation = DataSubSet(validation_X, validation_y)
-        self.test = DataSubSet(test_X, test_y)
+                    df = pd.DataFrame(df)
+                    df['performer'] = performer_id
+                    train_X.append(df.to_numpy())
+        if chunk_training:
+            self.train = DataSubSet(train_X, train_y)
+        else:
+            train_X = np.concatenate(train_X)
+            self.train = pd.DataFrame(train_X, columns=data.columns)
+        if output_type == 'df':
+            self.validation = validation_X, validation_y
+            self.test = test_X, test_y
+        else:
+            self.validation = DataSubSet(validation_X, validation_y)
+            self.test = DataSubSet(test_X, test_y)

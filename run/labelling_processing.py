@@ -1,10 +1,9 @@
+import numpy as np
 import pandas as pd
+from sklearn.experimental import enable_iterative_imputer
+from sklearn.impute import IterativeImputer
 
 from utils.paths import path_from_root
-
-# Values for scaling
-max_value = 7
-min_value = 0
 
 # Save
 SAVE = True
@@ -31,9 +30,12 @@ data_columns = ['Question_1_1_1', 'Question_2_1_1',
                 'Question_6_5_1', 'Question_7_1_1', 'Question_7_2_1', 'Question_7_3_1',
                 'Question_8_1_1', 'Question_8_2_1', 'Question_9_1_1']
 data = pd.DataFrame(raw_df[data_columns])
+data_np = data.to_numpy(dtype=float)
+data_np[data_np == 0] = np.NAN
 
-# Scaling
-scaled_data = (data - min_value) / (max_value - min_value)
+imp_mean = IterativeImputer(random_state=0)
+imputed = imp_mean.fit_transform(data_np)
+imputed_df = pd.DataFrame(imputed, columns=data.columns)
 
 if SAVE:
-    scaled_data.to_json(file_path_output)
+    imputed_df.to_json(file_path_output)

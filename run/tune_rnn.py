@@ -35,10 +35,9 @@ best_end_score = load_best_end_score(STUDY_NAME)
 
 # Dataset and loaders
 dataset = ECompetitionDataSet()
-train, val = dataset.split()
-train_loader = DataLoader(train, batch_size=BATCH_SIZE,
+train_loader = DataLoader(dataset.train, batch_size=BATCH_SIZE,
                           shuffle=True)
-validation_loader = DataLoader(val, batch_size=BATCH_SIZE,
+validation_loader = DataLoader(dataset.validation, batch_size=BATCH_SIZE,
                                shuffle=False)
 
 

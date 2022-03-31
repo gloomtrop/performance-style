@@ -4,7 +4,7 @@ import optuna
 from models.kde import KDE_classifier
 from utils.loading import load_data
 from utils.preprocessing import NUMBER_COLUMN_NAMES, PERFORMERS
-from utils.testing import compute_accuracy
+from sklearn.metrics import accuracy_score
 from utils.testing import get_kfold_data, test_k_fold
 
 K = 8
@@ -22,7 +22,7 @@ def objective(trial):
     for fold in range(K):
         clf = KDE_classifier(train[fold], PERFORMERS, weights, bandwidth, n_samples)
         y_pred = y_pred + test_k_fold(clf, test[fold], PERFORMERS)
-    accuracy = compute_accuracy(y_true, y_pred)
+    accuracy = accuracy_score(y_true, y_pred)
     return 1 - accuracy
 
 

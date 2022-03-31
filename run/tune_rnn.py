@@ -7,7 +7,7 @@ from tqdm import trange
 
 from datasets.ecomp import ECompetitionDataSet
 from models.rnn import LSTM
-from utils.testing import compute_accuracy
+from sklearn.metrics import accuracy_score
 from utils.training import get_storage, handle_pruning, save_best_end_model
 from utils.training import save_best_intermediary_model, load_best_intermediary_score, \
     load_best_end_score
@@ -76,7 +76,7 @@ def objective(trial):
             y_true += torch.argmax(label, dim=1)
             y_pred += torch.argmax(outputs, dim=1)
 
-        accuracy = float(compute_accuracy(y_true, y_pred))
+        accuracy = float(accuracy_score(y_true, y_pred))
 
         if accuracy > best_intermediary_score:
             best_intermediary_score = accuracy

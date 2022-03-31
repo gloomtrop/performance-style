@@ -4,7 +4,7 @@ from models.kde import KDE_classifier
 from utils.loading import load_data, performers_last_name_list
 from utils.plotting import plot_confusion_matrix
 from utils.preprocessing import PERFORMERS
-from utils.testing import compute_accuracy
+from sklearn.metrics import accuracy_score
 from utils.testing import get_kfold_data, test_k_fold
 
 K = 8
@@ -24,5 +24,5 @@ for fold in range(K):
     clf = KDE_classifier(train[fold], PERFORMERS, WEIGHTS, BANDWIDTH, N_SAMPLES)
     y_pred = y_pred + test_k_fold(clf, test[fold], PERFORMERS)
 
-print(compute_accuracy(y_true, y_pred))
+print(accuracy_score(y_true, y_pred))
 plot_confusion_matrix(y_true, y_pred, PERFORMERS, PERFORMER_NAMES)

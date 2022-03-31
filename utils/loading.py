@@ -1,7 +1,7 @@
 import pandas as pd
 import torch
 
-from utils.paths import processed_ecomp_path, path_from_root, processed_labelled_path
+from utils.paths import processed_path, path_from_root, processed_labelled_path
 from utils.preprocessing import NOTES_FILENAME, DEVIATIONS_FROM_SCORE_FILENAME, DEVIATIONS_FROM_AVERAGE_FILENAME
 
 META_FILENAME = 'meta.json'
@@ -20,17 +20,17 @@ def load_model(path):
     return model
 
 
-def load_notes(piece='D960'):
-    notes_path = processed_ecomp_path(piece, NOTES_FILENAME)
+def load_notes(dataset='e_competition', piece='D960'):
+    notes_path = processed_path(dataset, piece, NOTES_FILENAME)
     return pd.read_json(notes_path)
 
 
-def load_data(piece='D960', deviation_from='average'):
+def load_data(dataset='e_competition', piece='D960', deviation_from='average'):
     if deviation_from == 'average':
         file_name = DEVIATIONS_FROM_AVERAGE_FILENAME
     else:
         file_name = DEVIATIONS_FROM_SCORE_FILENAME
-    path = processed_ecomp_path(piece, file_name)
+    path = processed_path(dataset, piece, file_name)
     return pd.read_json(path).dropna()
 
 

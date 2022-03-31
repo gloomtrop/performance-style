@@ -23,8 +23,8 @@ def raw_path(dataset, piece, *args):
     return path_from_root('data', 'raw', dataset, piece, *args)
 
 
-def processed_ecomp_path(piece, *args):
-    return path_from_root('data', 'processed', 'e_competition', piece, *args)
+def processed_path(dataset, piece, *args):
+    return path_from_root('data', 'processed', dataset, piece, *args)
 
 
 def processed_labelled_path(*args):

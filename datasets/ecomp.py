@@ -60,7 +60,7 @@ class ECompetitionDataSet:
                  output_type='tensor', piece='D960', deviation_type='average', processing=None, sequence_size=50,
                  sequence_offset=10):
 
-        data = load_data(piece, deviation_from=deviation_type)
+        data = load_data('e_competition', piece, deviation_from=deviation_type)
 
         if processing == 'standardized':
             data = standardize_df(data)

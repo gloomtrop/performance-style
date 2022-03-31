@@ -21,8 +21,12 @@ performer_notes = pd.DataFrame(notes[~score_mask])
 average = compute_average_performance(performer_notes)
 print('Average is computed')
 
-average_deviations = compute_deviations(performer_notes, average)
-score_deviations = compute_deviations(performer_notes, score_notes.set_index('note_id'))
+if DATASET == 'labelling':
+    average_deviations = compute_deviations(notes, average)
+    score_deviations = compute_deviations(notes, score_notes.set_index('note_id'))
+else:
+    average_deviations = compute_deviations(performer_notes, average)
+    score_deviations = compute_deviations(performer_notes, score_notes.set_index('note_id'))
 print('Deviations from average and score are computed')
 
 # Saving

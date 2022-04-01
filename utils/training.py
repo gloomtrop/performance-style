@@ -42,18 +42,24 @@ def load_model_score(file_name):
     return saved_dict['score']
 
 
-def load_best_intermediary_score(study_name):
+def load_best_intermediary_score(study_name, maximize=True):
     try:
         return load_model_score(intermediary_file_name(study_name))
     except FileNotFoundError:
-        return 0
+        if maximize:
+            return 0
+        else:
+            return float('inf')
 
 
-def load_best_end_score(study_name):
+def load_best_end_score(study_name, maximize=True):
     try:
         return load_model_score(end_file_name(study_name))
     except FileNotFoundError:
-        return 0
+        if maximize:
+            return 0
+        else:
+            return float('inf')
 
 
 def save_best_intermediary_model(study, model, score):

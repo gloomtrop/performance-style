@@ -6,11 +6,13 @@ from utils.loading import load_labelled_data, load_data
 from datasets.subset import DataSubSet
 
 RANDOM_STATE = 42
+MAX_NUM = 7
+MIN_NUM = 1
 
 
 class LabelledDataSet(Dataset):
 
-    def __init__(self, validation_size=0.1, test_size=0.1, piece='D960', deviation_type='average'):
+    def __init__(self, validation_size=0.1, test_size=0.1, piece='D960', deviation_type='average', scaled=False):
         data = load_data('labelling', piece, deviation_from=deviation_type)
         labels = load_labelled_data()
 
@@ -27,6 +29,9 @@ class LabelledDataSet(Dataset):
 
         for index, row in labels.iterrows():
             y_np = row[y_columns].to_numpy(dtype=numpy.float32)
+            # Scaling from -1 to 1
+            if scaled:
+                y_np = (y_np - MIN_NUM) / (0.5 * (MAX_NUM - MIN_NUM)) - 1
             y.append(torch.from_numpy(y_np))
             performer_mask = data['performer'].astype(str) == row['performer']
             segment_mask = data['segment'] == row['segment']

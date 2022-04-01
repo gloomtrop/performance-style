@@ -10,12 +10,12 @@ RANDOM_STATE = 42
 
 class LabelledDataSet(Dataset):
 
-    def __init__(self, validation_share=0.1, test_share=0.1, piece='D960', deviation_type='average'):
+    def __init__(self, validation_size=0.1, test_size=0.1, piece='D960', deviation_type='average'):
         data = load_data('labelling', piece, deviation_from=deviation_type)
         labels = load_labelled_data()
 
-        test_validation_size = validation_share + test_share
-        validation_size = validation_share / test_validation_size
+        test_validation_size = validation_size + test_size
+        test_size_of_test_validation = test_size / test_validation_size
 
         x = []
         y = []
@@ -35,7 +35,8 @@ class LabelledDataSet(Dataset):
             x.append(torch.from_numpy(x_np))
         X_train, X_val_test, y_train, y_val_test = train_test_split(x, y, test_size=test_validation_size,
                                                                     random_state=RANDOM_STATE)
-        X_validation, X_test, y_validation, y_test = train_test_split(X_val_test, y_val_test, test_size=validation_size,
+        X_validation, X_test, y_validation, y_test = train_test_split(X_val_test, y_val_test,
+                                                                      test_size=test_size_of_test_validation,
                                                                       random_state=RANDOM_STATE)
 
         self.train = DataSubSet(X_train, y_train)

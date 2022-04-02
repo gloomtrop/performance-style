@@ -47,7 +47,7 @@ def load_best_intermediary_score(study_name, maximize=True):
         return load_model_score(intermediary_file_name(study_name))
     except FileNotFoundError:
         if maximize:
-            return 0
+            return -float('inf')
         else:
             return float('inf')
 
@@ -57,7 +57,7 @@ def load_best_end_score(study_name, maximize=True):
         return load_model_score(end_file_name(study_name))
     except FileNotFoundError:
         if maximize:
-            return 0
+            return -float('inf')
         else:
             return float('inf')
 

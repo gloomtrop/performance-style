@@ -4,7 +4,7 @@ import optuna
 from datasets.ecomp import ECompetitionDataSet
 from models.kde import KDE_classifier
 from utils.preprocessing import NUMBER_COLUMN_NAMES
-from utils.testing import compute_accuracy
+from sklearn.metrics import accuracy_score
 from utils.training import get_storage
 
 # Ignore entropy true divide errors
@@ -31,7 +31,7 @@ def objective(trial):
         y_pred.append(model.predict(X))
         y_true.append(y.argmax())
 
-    return compute_accuracy(y_true, y_pred)
+    return accuracy_score(y_true, y_pred)
 
 
 study = optuna.load_study(study_name=STUDY_NAME, storage=get_storage())

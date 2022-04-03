@@ -1,0 +1,10 @@
+# Schubert dataset is not pushed to git
+# Download it from: https://www.piano-e-competition.com/midi_2018.asp
+# Some files are downloaded from other years, check the json
+
+# Everything should be disregarded...
+*
+
+# ...except the .gitignore file and meta
+!.gitignore
+!data.csv

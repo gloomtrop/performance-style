@@ -2,11 +2,6 @@ import pandas as pd
 from sklearn.model_selection import KFold
 
 
-def compute_accuracy(y_true, y_pred):
-    equal = [t == p for t, p in zip(y_true, y_pred)]
-    return sum(equal) / len(equal)
-
-
 def chunker(seq, size, offset):
     positions = list(range(0, len(seq) - 1, offset))
     filtered = filter(lambda pos: pos + size < seq.shape[0], positions)

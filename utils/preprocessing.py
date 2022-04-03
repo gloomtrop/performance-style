@@ -22,6 +22,16 @@ DEVIATIONS_FROM_SCORE_FILENAME = 'deviations_from_score.json'
 PERFORMERS = [f'p{i}' for i in range(11)]
 
 
+def get_performer(match_filename, dataset):
+    if 'score' in match_filename:
+        return 'score'
+    if dataset == 'e_competition':
+        performance = match_filename.split('_')[0]
+        return performance.split('-')[0]
+    elif dataset == 'labelling':
+        return match_filename.split('_')[3]
+
+
 def get_notes_df(file_path: str) -> pd.DataFrame:
     lines = []
     with open(file_path) as f:
@@ -64,24 +74,24 @@ def get_notes_df(file_path: str) -> pd.DataFrame:
 
     # Remove duplicates, several notes have been matched with the same note in the score
     removed_duplicates = matched_notes[~matched_notes['note_id'].duplicated(keep='first')].reset_index(drop=True)
-
     return removed_duplicates
 
 
-def get_notes_df_from_all_match_files(piece: str) -> pd.DataFrame:
-    match_folder_path = match_path(piece)
+def get_notes_df_from_all_match_files(dataset: str, piece: str) -> pd.DataFrame:
+    match_folder_path = match_path(dataset, piece)
     performances = get_files(match_folder_path)
     all_notes = pd.DataFrame()
     for match_filename in performances:
-        if 'score' in match_filename:
-            performer = 'score'
-        else:
-            performance = match_filename.split('_')[0]
-            performer = performance.split('-')[0]
-        match_filepath = match_path(piece, match_filename)
+        performer = get_performer(match_filename, dataset)
+        match_filepath = match_path(dataset, piece, match_filename)
         new_notes = get_notes_df(match_filepath)
         new_notes['performer'] = performer
-        new_notes['uid'] = performer + '-' + new_notes['note_id']
+
+        if dataset == 'labelling':
+            new_notes['segment'] = match_filename.split('_')[4]
+            new_notes['uid'] = performer + '-' + new_notes['segment'] + '-' + new_notes['note_id']
+        else:
+            new_notes['uid'] = performer + '-' + new_notes['note_id']
         all_notes = pd.concat([all_notes, new_notes.set_index(['uid'])])
     return all_notes
 
@@ -97,6 +107,7 @@ def compute_deviations(notes: pd.DataFrame, reference: pd.DataFrame) -> pd.DataF
     for performer in notes['performer'].unique():
         new_deviations = pd.DataFrame()
         performer_notes = notes[notes['performer'] == performer].set_index('note_id')
+
         for column in NUMBER_COLUMN_NAMES:
             new_deviations[column] = performer_notes[column] - reference[column]
 
@@ -105,12 +116,13 @@ def compute_deviations(notes: pd.DataFrame, reference: pd.DataFrame) -> pd.DataF
         filtered_deviations = pd.DataFrame(new_deviations[mask])
 
         filtered_deviations['performer'] = performer
-        uid = performer + '-' + pd.Series(filtered_deviations.index)
+        if 'segment' in notes.columns:
+            filtered_deviations = filtered_deviations.join(performer_notes['segment'])
 
-        df = filtered_deviations.set_index(uid)
+        df = filtered_deviations.reset_index()
 
         deviations = pd.concat([deviations, df])
-    return deviations
+    return deviations.reset_index(drop=True)
 
 
 def transform_data(data, chunk_size=50, chunk_offset=25):

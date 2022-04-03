@@ -4,7 +4,7 @@ from datasets.ecomp import ECompetitionDataSet
 from models.kde import KDE_classifier
 from utils.loading import performers_last_name_list
 from utils.plotting import plot_confusion_matrix
-from utils.testing import compute_accuracy
+from sklearn.metrics import accuracy_score
 
 # Ignore entropy true divide errors
 np.seterr(divide='ignore', invalid='ignore')
@@ -24,5 +24,5 @@ for X, y in zip(*dataset.test):
     y_pred.append(model.predict(X))
     y_true.append(y.argmax())
 
-print(f'Accuracy: {compute_accuracy(y_true, y_pred)}')
+print(f'Accuracy: {accuracy_score(y_true, y_pred)}')
 plot_confusion_matrix(y_true, y_pred, performer_ids, performers_last_name_list())

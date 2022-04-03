@@ -4,7 +4,7 @@ from models.kde import KDE_classifier
 from utils.loading import load_split, performers_last_name_list
 from utils.plotting import plot_confusion_matrix
 from utils.preprocessing import normalize_df, standardize_df
-from utils.testing import test_classifier, compute_accuracy
+from utils.testing import test_classifier, accuracy_score
 
 PERFORMERS = [f'p{i}' for i in range(11)]
 PERFORMER_NAMES = performers_last_name_list()
@@ -32,9 +32,9 @@ y_true, y_pred = test_classifier(cl, test, SAMPLE_SIZE, SAMPLE_OFFSET)
 y_true_n, y_pred_n = test_classifier(cln, norm_test, SAMPLE_SIZE, SAMPLE_OFFSET)
 y_true_s, y_pred_s = test_classifier(cls, standardized_test, SAMPLE_SIZE, SAMPLE_OFFSET)
 
-print(f'Raw values: {compute_accuracy(y_true, y_pred)}')
-print(f'Normalized values: {compute_accuracy(y_true_n, y_pred_n)}')
-print(f'Standardized values: {compute_accuracy(y_true_s, y_pred_s)}')
+print(f'Raw values: {accuracy_score(y_true, y_pred)}')
+print(f'Normalized values: {accuracy_score(y_true_n, y_pred_n)}')
+print(f'Standardized values: {accuracy_score(y_true_s, y_pred_s)}')
 
 plot_confusion_matrix(y_true, y_pred, PERFORMERS, PERFORMER_NAMES)
 plot_confusion_matrix(y_true_n, y_pred_n, PERFORMERS, PERFORMER_NAMES)

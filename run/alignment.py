@@ -2,37 +2,34 @@ import os
 import shutil
 import subprocess
 
-from utils.paths import get_files, raw_midi_path, alignment_path, match_path
-from utils.progress import ProgressBar
+from utils.paths import get_files, raw_path, alignment_path, match_path
+from tqdm import tqdm
 
+DATASET = 'labelling'
 PIECE = 'D960'
 
-midi_files = get_files(raw_midi_path(PIECE))
-segmented_midi_files = list(filter(lambda x: 'all' not in x, midi_files))
+midi_files = get_files(raw_path(DATASET, PIECE))
 
 # Changing working directory to alignment directory
 os.chdir(alignment_path())
 print('Changed directory to alignment directory')
 
-progress = ProgressBar(len(segmented_midi_files), text=f'Aligning midi performances of {PIECE}:')
-
-for i, midi_file in enumerate(segmented_midi_files[:1]):
-    progress.show(i)
+for midi_file in tqdm(midi_files):
     midi_name = midi_file.split('.')[0]
 
     # Copying midi file to alignment directory
-    midi_src = raw_midi_path(PIECE, midi_file)
+    midi_src = raw_path(DATASET, PIECE, midi_file)
     midi_dst = alignment_path(midi_file)
     shutil.copyfile(midi_src, midi_dst)
 
     # Aligning
-    process = subprocess.Popen(['./MusicXMLToMIDIAlign.sh', 'D960', midi_name], stdout=subprocess.DEVNULL)
+    process = subprocess.Popen(['./MusicXMLToMIDIAlign.sh', PIECE, midi_name], stdout=subprocess.DEVNULL)
     process.wait()
 
     # Copying match file to processed data
     match_file = midi_name + '_match.txt'
     match_src = alignment_path(match_file)
-    match_dst = match_path(PIECE, match_file)
+    match_dst = match_path(DATASET, PIECE, match_file)
     shutil.copyfile(match_src, match_dst)
 
     # Identify extra created file

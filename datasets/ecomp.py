@@ -55,12 +55,12 @@ def split_time_series(time_steps, sequence_size, sequence_offset, validation_sha
 
 
 class ECompetitionDataSet:
-    def __init__(self, validation_share=0.1, test_share=0.1, validation_test_chunks=5,
+    def __init__(self, validation_size=0.1, test_size=0.1, validation_test_chunks=5,
                  chunk_training=True,
                  output_type='tensor', piece='D960', deviation_type='average', processing=None, sequence_size=50,
                  sequence_offset=10):
 
-        data = load_data(piece, deviation_from=deviation_type)
+        data = load_data('e_competition', piece, deviation_from=deviation_type)
 
         if processing == 'standardized':
             data = standardize_df(data)
@@ -88,8 +88,8 @@ class ECompetitionDataSet:
             y_true[performer_id] = 1
 
             indices = split_time_series(len(performer_data), sequence_size, sequence_offset,
-                                        validation_share,
-                                        test_share, validation_test_chunks)
+                                        validation_size,
+                                        test_size, validation_test_chunks)
 
             # Sort indices after start index
             indices.sort(key=lambda x: x[0])

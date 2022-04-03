@@ -19,20 +19,20 @@ def path_from_root(*args):
     return os.path.join(get_root_folder(), *args)
 
 
-def raw_midi_path(piece, *args):
-    return path_from_root('data', 'raw', 'e_competition', piece, *args)
+def raw_path(dataset, piece, *args):
+    return path_from_root('data', 'raw', dataset, piece, *args)
 
 
-def processed_ecomp_path(piece, *args):
-    return path_from_root('data', 'processed', 'e_competition', piece, *args)
+def processed_path(dataset, piece, *args):
+    return path_from_root('data', 'processed', dataset, piece, *args)
 
 
 def processed_labelled_path(*args):
     return path_from_root('data', 'processed', 'labelling', *args)
 
 
-def match_path(piece, *args):
-    return path_from_root('data', 'processed', piece, 'match', *args)
+def match_path(dataset, piece, *args):
+    return path_from_root('data', 'processed', dataset, piece, 'match', *args)
 
 
 def alignment_path(*args):
